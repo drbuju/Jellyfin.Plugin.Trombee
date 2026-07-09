@@ -1,6 +1,6 @@
 {
   "category": "General",
-  "changelog": "Auto-release: built for Jellyfin 10.11.8",
+  "changelog": "Auto-release: built for Jellyfin 10.11.x",
   "description": "Scans your Jellyfin library and builds an index of all actors, showing how many times each one appears across movies and episodes. Includes a web page accessible from the sidebar with a photo grid, search and pagination.",
   "guid": "c6d7356a-44b3-4a91-a86c-932d633b51b1",
   "name": "Trombee",
@@ -8,7 +8,7 @@
   "owner": "drbuju",
   "targetAbi": "10.11.0.0",
   "timestamp": "2026-05-17T19:58:15Z",
-  "version": "1.0.0.2",
+  "version": "1.0.0.7",
   "status": "Active",
   "autoUpdate": false,
   "imagePath": "thumb.png",
