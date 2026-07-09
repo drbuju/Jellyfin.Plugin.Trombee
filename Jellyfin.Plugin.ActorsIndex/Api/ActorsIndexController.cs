@@ -7,8 +7,8 @@ using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Jellyfin.Plugin.ActorsIndex.Configuration;
-using Jellyfin.Plugin.ActorsIndex.Services;
+using Jellyfin.Plugin.Trombee.Configuration;
+using Jellyfin.Plugin.Trombee.Services;
 using MediaBrowser.Common.Configuration;
 using MediaBrowser.Controller.Channels;
 using MediaBrowser.Controller.Library;
@@ -17,7 +17,7 @@ using MediaBrowser.Model.IO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Jellyfin.Plugin.ActorsIndex.Api;
+namespace Jellyfin.Plugin.Trombee.Api;
 
 /// <summary>
 /// Simple API for Actors Index.

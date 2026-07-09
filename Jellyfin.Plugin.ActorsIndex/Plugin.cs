@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using Jellyfin.Plugin.ActorsIndex.Configuration;
+using Jellyfin.Plugin.Trombee.Configuration;
 using MediaBrowser.Common.Configuration;
 using MediaBrowser.Common.Plugins;
 using MediaBrowser.Model.Plugins;
 using MediaBrowser.Model.Serialization;
 
-namespace Jellyfin.Plugin.ActorsIndex;
+namespace Jellyfin.Plugin.Trombee;
 
 /// <summary>
 /// The main plugin.

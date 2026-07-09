@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Jellyfin.Data.Enums;
-using Jellyfin.Plugin.ActorsIndex.Services;
+using Jellyfin.Plugin.Trombee.Services;
 using MediaBrowser.Controller.Channels;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Entities.TV;
@@ -15,7 +15,7 @@ using MediaBrowser.Model.Drawing;
 using MediaBrowser.Model.Dto;
 using MediaBrowser.Model.Entities;
 
-namespace Jellyfin.Plugin.ActorsIndex.Channels;
+namespace Jellyfin.Plugin.Trombee.Channels;
 
 /// <summary>
 /// Jellyfin Channel that exposes the actors index on the home screen.
@@ -82,7 +82,7 @@ public class ActorsIndexChannel : IChannel, IHasCacheKey, IRequiresMediaInfoCall
         }
 
         var stream = GetType().Assembly
-            .GetManifestResourceStream("Jellyfin.Plugin.ActorsIndex.Images.channel_icon.png");
+            .GetManifestResourceStream("Jellyfin.Plugin.Trombee.Images.channel_icon.png");
 
         if (stream is null)
         {

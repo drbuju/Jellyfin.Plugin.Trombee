@@ -123,8 +123,8 @@ jobs:
         run: |
           PVER="${{ steps.newver.outputs.version }}"
           OUT="Jellyfin.Plugin.ActorsIndex/bin/Release/net9.0/publish"
-          ZIP="Jellyfin.Plugin.ActorsIndex_${PVER}.zip"
-          zip -j "$ZIP" "$OUT/Jellyfin.Plugin.ActorsIndex.dll" "$OUT/meta.json" "$OUT/thumb.png"
+          ZIP="Jellyfin.Plugin.Trombee_${PVER}.zip"
+          zip -j "$ZIP" "$OUT/Jellyfin.Plugin.Trombee.dll" "$OUT/meta.json" "$OUT/thumb.png"
           MD5=$(md5sum "$ZIP" | cut -d' ' -f1)
           echo "zip=$ZIP"   >> "$GITHUB_OUTPUT"
           echo "md5=$MD5"   >> "$GITHUB_OUTPUT"
@@ -137,7 +137,7 @@ jobs:
           PVER="${{ steps.newver.outputs.version }}"
           JVER="${{ steps.versions.outputs.jellyfin }}"
           MD5="${{ steps.package.outputs.md5 }}"
-          SOURCE_URL="https://github.com/${{ github.repository }}/releases/download/v${PVER}/Jellyfin.Plugin.ActorsIndex_${PVER}.zip"
+          SOURCE_URL="https://github.com/${{ github.repository }}/releases/download/v${PVER}/Jellyfin.Plugin.Trombee_${PVER}.zip"
           python3 - <<PYEOF
           import json
           from datetime import datetime, timezone

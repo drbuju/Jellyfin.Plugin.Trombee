@@ -1,6 +1,6 @@
 using MediaBrowser.Model.Plugins;
 
-namespace Jellyfin.Plugin.ActorsIndex.Configuration;
+namespace Jellyfin.Plugin.Trombee.Configuration;
 
 /// <summary>
 /// Plugin configuration.

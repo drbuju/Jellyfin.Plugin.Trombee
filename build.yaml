@@ -13,7 +13,7 @@ description: >
 category: "General"
 owner: "drbuju"
 artifacts:
-- "Jellyfin.Plugin.ActorsIndex.dll"
+- "Jellyfin.Plugin.Trombee.dll"
 - "meta.json"
 - "thumb.png"
 changelog: >

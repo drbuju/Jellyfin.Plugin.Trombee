@@ -5,7 +5,7 @@ using MediaBrowser.Controller.Entities.Movies;
 using MediaBrowser.Controller.Entities.TV;
 using MediaBrowser.Controller.Library;
 
-namespace Jellyfin.Plugin.ActorsIndex.Services;
+namespace Jellyfin.Plugin.Trombee.Services;
 
 /// <summary>
 /// Provides Actors Index data access.

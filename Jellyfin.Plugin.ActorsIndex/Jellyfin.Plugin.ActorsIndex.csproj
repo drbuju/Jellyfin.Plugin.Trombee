@@ -2,10 +2,11 @@
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
-    <Version>1.0.0.5</Version>
-    <AssemblyVersion>1.0.0.5</AssemblyVersion>
-    <FileVersion>1.0.0.5</FileVersion>
-    <RootNamespace>Jellyfin.Plugin.ActorsIndex</RootNamespace>
+    <Version>1.0.0.2</Version>
+    <AssemblyVersion>1.0.0.2</AssemblyVersion>
+    <FileVersion>1.0.0.2</FileVersion>
+    <AssemblyName>Jellyfin.Plugin.Trombee</AssemblyName>
+    <RootNamespace>Jellyfin.Plugin.Trombee</RootNamespace>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <Nullable>enable</Nullable>
@@ -37,7 +38,7 @@
     <EmbeddedResource Include="Images\channel_icon.png" />
     <None Remove="Images\thumb.png" />
     <EmbeddedResource Include="Images\thumb.png">
-      <LogicalName>Jellyfin.Plugin.ActorsIndex.thumb.png</LogicalName>
+      <LogicalName>Jellyfin.Plugin.Trombee.thumb.png</LogicalName>
     </EmbeddedResource>
     <Content Include="Images\thumb.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

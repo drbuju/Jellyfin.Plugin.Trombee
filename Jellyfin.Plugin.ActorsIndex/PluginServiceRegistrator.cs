@@ -1,11 +1,11 @@
-using Jellyfin.Plugin.ActorsIndex.Channels;
-using Jellyfin.Plugin.ActorsIndex.Services;
+using Jellyfin.Plugin.Trombee.Channels;
+using Jellyfin.Plugin.Trombee.Services;
 using MediaBrowser.Controller;
 using MediaBrowser.Controller.Channels;
 using MediaBrowser.Controller.Plugins;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Jellyfin.Plugin.ActorsIndex;
+namespace Jellyfin.Plugin.Trombee;
 
 /// <summary>
 /// Registers plugin services.

@@ -32,7 +32,7 @@ Browse all the actors in your Jellyfin library on a single screen: a full grid w
 
 ### Method B — Manual installation
 
-1. Download the latest `Jellyfin.Plugin.ActorsIndex_x.x.x.x.zip` from the [Releases](https://github.com/drbuju/Jellyfin.Plugin.Trombee/releases) page
+1. Download the latest `Jellyfin.Plugin.Trombee_x.x.x.x.zip` from the [Releases](https://github.com/drbuju/Jellyfin.Plugin.Trombee/releases) page
 2. Extract and copy all the files into Jellyfin's plugin folder:
    - **Linux**: `/var/lib/jellyfin/plugins/ActorsIndex/`
    - **Windows**: `%LOCALAPPDATA%\jellyfin\plugins\ActorsIndex\`
