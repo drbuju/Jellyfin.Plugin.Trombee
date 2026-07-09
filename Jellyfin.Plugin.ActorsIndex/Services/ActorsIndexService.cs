@@ -43,7 +43,7 @@ public class ActorsIndexService
     /// </summary>
     /// <param name="user">The user to scope the results to, or <c>null</c> for no scoping.</param>
     /// <returns>A sorted list of actors with occurrence counts.</returns>
-    public object GetActorsIndex(Jellyfin.Data.Entities.User? user = null)
+    public object GetActorsIndex(Jellyfin.Database.Implementations.Entities.User? user = null)
     {
         var config = Plugin.Instance?.Configuration ?? new Configuration.PluginConfiguration();
 
