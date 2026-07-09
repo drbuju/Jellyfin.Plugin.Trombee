@@ -37,15 +37,19 @@ public class ActorsIndexService
     }
 
     /// <summary>
-    /// Returns the actors index: each actor with their appearance count and related items.
+    /// Returns the actors index: each actor with their appearance count and related items,
+    /// scoped to the libraries the given user has access to. Pass <c>null</c> to include
+    /// everything (used internally / by administrators).
     /// </summary>
+    /// <param name="user">The user to scope the results to, or <c>null</c> for no scoping.</param>
     /// <returns>A sorted list of actors with occurrence counts.</returns>
-    public object GetActorsIndex()
+    public object GetActorsIndex(Jellyfin.Data.Entities.User? user = null)
     {
         var config = Plugin.Instance?.Configuration ?? new Configuration.PluginConfiguration();
 
-        // Get all movies and series from the library
-        var items = _libraryManager.GetItemList(new InternalItemsQuery
+        // Get all movies and series from the library, scoped to what this user can see
+        // (respects library access permissions and parental controls).
+        var items = _libraryManager.GetItemList(new InternalItemsQuery(user)
         {
             IncludeItemTypes = new[] { BaseItemKind.Movie, BaseItemKind.Series },
             Recursive = true

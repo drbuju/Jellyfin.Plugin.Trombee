@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Jellyfin.Extensions;
 using Jellyfin.Plugin.Trombee.Configuration;
 using Jellyfin.Plugin.Trombee.Services;
 using MediaBrowser.Common.Configuration;
@@ -40,6 +41,7 @@ public class ActorsIndexController : ControllerBase
 
     private readonly ActorsIndexService _actorsIndexService;
     private readonly ILibraryManager _libraryManager;
+    private readonly IUserManager _userManager;
     private readonly IProviderManager _providerManager;
     private readonly IFileSystem _fileSystem;
     private readonly IApplicationPaths _appPaths;
@@ -50,6 +52,7 @@ public class ActorsIndexController : ControllerBase
     /// </summary>
     /// <param name="actorsIndexService">The actors index service.</param>
     /// <param name="libraryManager">The library manager.</param>
+    /// <param name="userManager">The user manager.</param>
     /// <param name="providerManager">The provider manager.</param>
     /// <param name="fileSystem">The file system.</param>
     /// <param name="appPaths">The application paths.</param>
@@ -57,6 +60,7 @@ public class ActorsIndexController : ControllerBase
     public ActorsIndexController(
         ActorsIndexService actorsIndexService,
         ILibraryManager libraryManager,
+        IUserManager userManager,
         IProviderManager providerManager,
         IFileSystem fileSystem,
         IApplicationPaths appPaths,
@@ -64,6 +68,7 @@ public class ActorsIndexController : ControllerBase
     {
         _actorsIndexService = actorsIndexService;
         _libraryManager = libraryManager;
+        _userManager = userManager;
         _providerManager = providerManager;
         _fileSystem = fileSystem;
         _appPaths = appPaths;
@@ -141,7 +146,9 @@ public class ActorsIndexController : ControllerBase
     [HttpGet("actors-index")]
     public ActionResult<object> GetActorsIndex()
     {
-        return Ok(_actorsIndexService.GetActorsIndex());
+        var userId = User.GetUserId();
+        var callingUser = userId != Guid.Empty ? _userManager.GetUserById(userId) : null;
+        return Ok(_actorsIndexService.GetActorsIndex(callingUser));
     }
 
     /// <summary>
