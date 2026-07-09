@@ -7,7 +7,6 @@ using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Jellyfin.Extensions;
 using Jellyfin.Plugin.Trombee.Configuration;
 using Jellyfin.Plugin.Trombee.Services;
 using MediaBrowser.Common.Configuration;
@@ -550,5 +549,28 @@ public class ActorsIndexController : ControllerBase
                 Directory.Delete(tempDir, recursive: true);
             }
         }
+    }
+}
+
+/// <summary>
+/// Extension methods for resolving the authenticated user from claims.
+/// </summary>
+internal static class ActorsIndexClaimsPrincipalExtensions
+{
+    /// <summary>
+    /// Returns the authenticated user's ID from the "Jellyfin-UserId" claim, or
+    /// <see cref="Guid.Empty"/> if not present/parseable.
+    /// </summary>
+    /// <param name="user">The claims principal for the current request.</param>
+    /// <returns>The user's ID, or <see cref="Guid.Empty"/>.</returns>
+    public static Guid GetUserId(this System.Security.Claims.ClaimsPrincipal user)
+    {
+        var userIdClaim = user.FindFirst("Jellyfin-UserId");
+        if (userIdClaim is not null && Guid.TryParse(userIdClaim.Value, out var userId))
+        {
+            return userId;
+        }
+
+        return Guid.Empty;
     }
 }
