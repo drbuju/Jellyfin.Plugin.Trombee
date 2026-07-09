@@ -23,17 +23,7 @@ namespace Jellyfin.Plugin.Trombee.Api;
 [Route("Trombee")]
 public class ActorsIndexController : ControllerBase
 {
-    private const string InjectionTag = "\n    <!-- Trombee --><script src=\"/Trombee/ui-button.js\"></script><!-- /Trombee -->";
     private const string PluginManifestUrl = "https://raw.githubusercontent.com/drbuju/Jellyfin.Plugin.Trombee/main/manifest.json";
-
-    private static readonly string[] WebRootCandidates =
-    [
-        "/usr/share/jellyfin/web",
-        "/usr/lib/jellyfin/web",
-        "/usr/lib/jellyfin-web",
-        "/opt/jellyfin/web",
-        "/var/lib/jellyfin/web",
-    ];
 
     private readonly ActorsIndexService _actorsIndexService;
     private readonly ILibraryManager _libraryManager;
@@ -201,123 +191,6 @@ public class ActorsIndexController : ControllerBase
         };
 
         return new JsonResult(manifest);
-    }
-
-    // ── UI injection ───────────────────────────────────────────────────────
-
-    private static string? FindIndexHtml()
-    {
-        foreach (var dir in WebRootCandidates)
-        {
-            var p = Path.Combine(dir, "index.html");
-            if (System.IO.File.Exists(p))
-            {
-                return p;
-            }
-        }
-
-        return null;
-    }
-
-    /// <summary>
-    /// Patches Jellyfin's index.html to inject the actors-index floating button.
-    /// </summary>
-    /// <returns>Operation result.</returns>
-    [HttpPost("inject-ui")]
-    [Authorize(Policy = "RequiresElevation")]
-    public ActionResult InjectUi()
-    {
-        var indexPath = FindIndexHtml();
-        if (indexPath is null)
-        {
-            return NotFound(new { error = "index.html not found. Searched in: " + string.Join(", ", WebRootCandidates) });
-        }
-
-        var html = System.IO.File.ReadAllText(indexPath);
-        if (html.Contains("<!-- Trombee -->", StringComparison.Ordinal))
-        {
-            return Ok(new { status = "already_injected", path = indexPath });
-        }
-
-        var patched = html.Replace("</body>", InjectionTag + "\n</body>", StringComparison.Ordinal);
-        if (string.Equals(patched, html, StringComparison.Ordinal))
-        {
-            return StatusCode(500, new { error = "Tag </body> not found in index.html" });
-        }
-
-        System.IO.File.WriteAllText(indexPath, patched);
-        return Ok(new { status = "ok", path = indexPath });
-    }
-
-    /// <summary>
-    /// Removes the injected script tag from Jellyfin's index.html.
-    /// </summary>
-    /// <returns>Operation result.</returns>
-    [HttpPost("remove-ui")]
-    [Authorize(Policy = "RequiresElevation")]
-    public ActionResult RemoveUi()
-    {
-        var indexPath = FindIndexHtml();
-        if (indexPath is null)
-        {
-            return NotFound(new { error = "index.html not found" });
-        }
-
-        var html = System.IO.File.ReadAllText(indexPath);
-        if (!html.Contains("<!-- Trombee -->", StringComparison.Ordinal))
-        {
-            return Ok(new { status = "not_injected" });
-        }
-
-        var patched = html.Replace(InjectionTag + "\n", string.Empty, StringComparison.Ordinal);
-        System.IO.File.WriteAllText(indexPath, patched);
-        return Ok(new { status = "ok", path = indexPath });
-    }
-
-    /// <summary>
-    /// Serves the floating-button JavaScript injected into Jellyfin's web UI.
-    /// </summary>
-    /// <returns>JavaScript content.</returns>
-    [HttpGet("ui-button.js")]
-    [AllowAnonymous]
-    public ContentResult GetUiButtonJs()
-    {
-        var js = @"(function(){
-  'use strict';
-  var ID='ai-fab';
-  function nav(){
-    var p='/configurationpage?name=TrombeeBrowse';
-    if(window.Emby&&window.Emby.Page&&window.Emby.Page.show){window.Emby.Page.show(p);}
-    else{window.location.hash=p;}
-  }
-  function playing(){
-    var v=document.querySelectorAll('video');
-    for(var i=0;i<v.length;i++){if(!v[i].paused&&!v[i].ended)return true;}
-    return false;
-  }
-  function sync(){
-    var b=document.getElementById(ID);
-    if(b)b.style.display=playing()?'none':'flex';
-  }
-  function add(){
-    if(document.getElementById(ID)){sync();return;}
-    var b=document.createElement('button');
-    b.id=ID;
-    b.title='Trombee';
-    b.innerHTML='&#127914;';
-    b.style.cssText='position:fixed;bottom:28px;right:28px;width:56px;height:56px;border-radius:50%;background:#0097e6;border:none;color:#fff;font-size:1.5em;cursor:pointer;z-index:9999;box-shadow:0 4px 18px rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;';
-    b.addEventListener('click',nav);
-    document.body.appendChild(b);
-    sync();
-  }
-  document.addEventListener('play',   sync,true);
-  document.addEventListener('pause',  sync,true);
-  document.addEventListener('ended',  sync,true);
-  document.addEventListener('emptied',sync,true);
-  if(document.body){add();}else{document.addEventListener('DOMContentLoaded',add);}
-  new MutationObserver(add).observe(document.documentElement,{childList:true,subtree:false});
-})();";
-        return Content(js, "application/javascript");
     }
 
     /// <summary>

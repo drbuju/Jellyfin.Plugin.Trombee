@@ -122,26 +122,6 @@
                     <div id="UpdateStatus" class="ai-status"></div>
                 </div>
 
-                <!-- ===== Home Button ===== -->
-                <div class="verticalSection ai-section">
-                    <div class="sectionTitleContainer flex align-items-center">
-                        <h2 class="sectionTitle">Home Button</h2>
-                    </div>
-                    <div class="verticalSection">
-                        <p>Adds a persistent &#127914; button on every Jellyfin page that opens Trombee directly.</p>
-                        <p>If the <strong>File Transformation</strong> plugin is installed, the button is injected automatically at every page load &mdash; no need to click anything below, and it survives Jellyfin updates. Without it, use the buttons below to write the button into <code>index.html</code> manually; you'll need to click "Inject" again after each Jellyfin update.</p>
-                    </div>
-                    <!-- is="emby-button" is required by the Jellyfin web framework -->
-                    <button is="emby-button" type="button" id="InjectUiBtn" class="raised emby-button">
-                        <span>&#127914; Inject Home button</span>
-                    </button>
-                    <!-- is="emby-button" is required by the Jellyfin web framework -->
-                    <button is="emby-button" type="button" id="RemoveUiBtn" class="raised emby-button ai-load-btn">
-                        <span>&#10006; Remove Home button</span>
-                    </button>
-                    <div id="InjectUiStatus" class="ai-status"></div>
-                </div>
-
                 <!-- ===== Trombee Viewer ===== -->
                 <div class="verticalSection ai-section">
                     <div class="sectionTitleContainer flex align-items-center">
@@ -331,73 +311,6 @@
                 .catch(function () {
                     // The server closes the connection during restart — this is expected
                     statusEl.textContent = '\u2714 Restart started. Wait a few seconds and reload the page.';
-                });
-            });
-
-            document.getElementById('InjectUiBtn').addEventListener('click', function () {
-                var btn = this;
-                var statusEl = document.getElementById('InjectUiStatus');
-                btn.disabled = true;
-                statusEl.textContent = 'Working\u2026';
-
-                fetch(ApiClient.getUrl('Trombee/inject-ui'), {
-                    method: 'POST',
-                    headers: { 'X-Emby-Authorization': 'MediaBrowser Token="' + ApiClient.accessToken() + '"' }
-                })
-                .then(function (r) {
-                    var status = r.status;
-                    return r.text().then(function (body) {
-                        var data;
-                        try { data = JSON.parse(body); } catch (e) { data = null; }
-                        return { httpStatus: status, data: data, rawBody: body };
-                    });
-                })
-                .then(function (result) {
-                    var data = result.data;
-                    if (data === null) {
-                        statusEl.textContent = '\u2716 HTTP ' + result.httpStatus + ' \u2014 Non-JSON response. Plugin not loaded or endpoint not found. Body: ' + result.rawBody.substring(0, 200);
-                        btn.disabled = false;
-                        return;
-                    }
-                    if (data.status === 'ok') {
-                        statusEl.textContent = '\u2714 Button injected into ' + data.path + '. Reload Jellyfin to see it.';
-                    } else if (data.status === 'already_injected') {
-                        statusEl.textContent = '\u2714 Button already present in ' + data.path + '.';
-                    } else {
-                        statusEl.textContent = '\u2716 HTTP ' + result.httpStatus + ' \u2014 ' + (data.error || JSON.stringify(data));
-                    }
-                    btn.disabled = false;
-                })
-                .catch(function (err) {
-                    statusEl.textContent = '\u2716 Network error: ' + (err && err.message ? err.message : String(err));
-                    btn.disabled = false;
-                });
-            });
-
-            document.getElementById('RemoveUiBtn').addEventListener('click', function () {
-                var btn = this;
-                var statusEl = document.getElementById('InjectUiStatus');
-                btn.disabled = true;
-                statusEl.textContent = 'Removing\u2026';
-
-                fetch(ApiClient.getUrl('Trombee/remove-ui'), {
-                    method: 'POST',
-                    headers: { 'X-Emby-Authorization': 'MediaBrowser Token="' + ApiClient.accessToken() + '"' }
-                })
-                .then(function (r) { return r.json(); })
-                .then(function (data) {
-                    if (data.status === 'ok') {
-                        statusEl.textContent = '\u2714 Button removed from ' + data.path + '. Reload to confirm.';
-                    } else if (data.status === 'not_injected') {
-                        statusEl.textContent = '\u2714 Button not present, nothing to remove.';
-                    } else {
-                        statusEl.textContent = '\u2716 ' + (data.error || JSON.stringify(data));
-                    }
-                    btn.disabled = false;
-                })
-                .catch(function () {
-                    statusEl.textContent = '\u2716 Error. Check the browser console.';
-                    btn.disabled = false;
                 });
             });
 

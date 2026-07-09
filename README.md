@@ -8,9 +8,8 @@ Browse all the actors in your Jellyfin library on a single screen: a full grid w
 
 - **Actors grid** — all actors/actresses, sortable by number of appearances or name A→Z
 - **Real-time search** — filter by name as you type
+- **Person type filter** — switch between Actors, Directors, Writers, and other credited roles
 - **Pagination** — configurable page size (default 60 actors per page)
-- **Floating button** — add a persistent 🎬 button on every Jellyfin page
-- **Channel integration** — actors accessible as a Jellyfin channel on the home screen
 - **Appearance filter** — hide actors with fewer than N appearances
 - **Automatic update** — updates itself from the settings page, no manual build required
 - **Non-admin access** — optionally expose the actors page to all users (not just admins) via Plugin Pages, scoped to each user's library permissions
@@ -38,23 +37,6 @@ Browse all the actors in your Jellyfin library on a single screen: a full grid w
    - **Linux**: `/var/lib/jellyfin/plugins/ActorsIndex/`
    - **Windows**: `%LOCALAPPDATA%\jellyfin\plugins\ActorsIndex\`
 3. Restart Jellyfin
-
-## Initial setup
-
-After installing and restarting Jellyfin:
-
-1. Go to **Dashboard → Plugins → Trombee → Settings**
-2. In the **"Home Button"** section, click **🎬 Inject Home button**
-   — this adds a persistent button on every Jellyfin page
-
-> **Linux only:** the "Inject" feature requires write permission on `/usr/share/jellyfin/web/index.html`.
-> To grant it permanently, run this command **once**:
-> ```bash
-> sudo bash -c 'mkdir -p /etc/systemd/system/jellyfin.service.d && printf "[Service]\nExecStartPre=+/bin/chown jellyfin /usr/share/jellyfin/web/index.html\n" > /etc/systemd/system/jellyfin.service.d/fix-webroot-perms.conf && systemctl daemon-reload && systemctl restart jellyfin'
-> ```
-> After a Jellyfin update, click **"Inject"** again to restore the button.
->
-> **Tip:** if you already installed the **File Transformation** plugin (see the section below), none of this is needed — the Home button is injected automatically at serve time, with no file permissions and no re-injecting after updates.
 
 ---
 
@@ -84,7 +66,7 @@ Trombee browse page registered with Plugin Pages successfully.
 
 Any signed-in user (not just admins) can then reach the page from the **hamburger menu**, under the section Plugin Pages adds (shown alongside other user-facing plugin pages, e.g. "Modular Home" if you use Home Screen Sections). The page itself only shows actors from the libraries that user actually has access to — it respects the same library permissions and parental controls as the rest of Jellyfin.
 
-The **Settings** button (⚙) inside the actors page is automatically hidden for non-admin users, and the underlying settings page — along with all maintenance actions (channel refresh, self-update, Home button injection) — is locked to administrators only, both in the interface and at the API level.
+The **Settings** button (⚙) inside the actors page is automatically hidden for non-admin users, and the underlying settings page — along with all maintenance actions (actor image refresh, self-update) — is locked to administrators only, both in the interface and at the API level.
 
 > If Plugin Pages isn't installed, the actors page remains reachable only through **Dashboard → Plugins → Trombee** (admin-only), exactly like before.
 
@@ -95,36 +77,17 @@ The **Settings** button (⚙) inside the actors page is automatically hidden for
 
 ---
 
-## What to do after a Jellyfin update
+## Updating the plugin
 
-### The 🎬 button disappeared from the Home page
+If a red error appears when using any of the settings-page actions after a Jellyfin update, the installed build was likely compiled for a previous Jellyfin version and is no longer compatible.
 
-Jellyfin overwrote `index.html` during the update.
-
-**Fix:** Dashboard → Plugins → Trombee → **"Inject Home button"**. Done.
-
----
-
-### Red error when clicking "Inject" (or "Remove")
-
-The plugin was built for a previous Jellyfin version and is no longer compatible.
-
-**Fix in 4 clicks:**
+**Fix in 3 clicks:**
 
 1. Dashboard → Plugins → Trombee → **"Check for updates"**
 2. If a newer version appears → click **"Download and install update"**
 3. Click **"Restart Jellyfin"**
-4. Click **"Inject Home button"**
 
 ✅ No terminal, no manual build.
-
----
-
-### Error persists even after updating the plugin (Linux only)
-
-After `apt upgrade jellyfin` on Debian/Ubuntu, `index.html` is owned by `root` again and the plugin can't write to it.
-
-**Fix:** re-run the one-time command from the "Initial setup" section above. This only needs to be redone if you fully uninstall and reinstall Jellyfin.
 
 ---
 
