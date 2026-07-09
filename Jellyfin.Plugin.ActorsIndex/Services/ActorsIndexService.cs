@@ -37,13 +37,14 @@ public class ActorsIndexService
     }
 
     /// <summary>
-    /// Returns the actors index: each actor with their appearance count and related items,
-    /// scoped to the libraries the given user has access to. Pass <c>null</c> to include
-    /// everything (used internally / by administrators).
+    /// Returns the actors index: each person of the given type with their appearance count
+    /// and related items, scoped to the libraries the given user has access to. Pass
+    /// <c>null</c> user to include everything (used internally / by administrators).
     /// </summary>
     /// <param name="user">The user to scope the results to, or <c>null</c> for no scoping.</param>
-    /// <returns>A sorted list of actors with occurrence counts.</returns>
-    public object GetActorsIndex(Jellyfin.Database.Implementations.Entities.User? user = null)
+    /// <param name="personKind">The type of person to include (defaults to Actor).</param>
+    /// <returns>A sorted list of people with occurrence counts.</returns>
+    public object GetActorsIndex(Jellyfin.Database.Implementations.Entities.User? user = null, PersonKind personKind = PersonKind.Actor)
     {
         var config = Plugin.Instance?.Configuration ?? new Configuration.PluginConfiguration();
 
@@ -63,7 +64,7 @@ public class ActorsIndexService
         {
             foreach (var person in _libraryManager.GetPeople(item))
             {
-                if (person.Type != PersonKind.Actor || person.Name is null)
+                if (person.Type != personKind || person.Name is null)
                 {
                     continue;
                 }

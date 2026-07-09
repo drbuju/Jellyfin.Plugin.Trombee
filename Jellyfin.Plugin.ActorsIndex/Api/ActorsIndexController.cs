@@ -141,13 +141,21 @@ public class ActorsIndexController : ControllerBase
     /// <summary>
     /// Returns the actors index with appearance counts.
     /// </summary>
-    /// <returns>Sorted list of actors with item occurrences.</returns>
+    /// <param name="personType">The type of person to include (e.g. Actor, Director, Writer). Defaults to Actor.</param>
+    /// <returns>Sorted list of people with item occurrences.</returns>
     [HttpGet("actors-index")]
-    public ActionResult<object> GetActorsIndex()
+    public ActionResult<object> GetActorsIndex([FromQuery] string? personType = null)
     {
         var userId = User.GetUserId();
         var callingUser = userId != Guid.Empty ? _userManager.GetUserById(userId) : null;
-        return Ok(_actorsIndexService.GetActorsIndex(callingUser));
+
+        var personKind = Jellyfin.Data.Enums.PersonKind.Actor;
+        if (!string.IsNullOrEmpty(personType))
+        {
+            _ = Enum.TryParse(personType, ignoreCase: true, out personKind);
+        }
+
+        return Ok(_actorsIndexService.GetActorsIndex(callingUser, personKind));
     }
 
     /// <summary>
