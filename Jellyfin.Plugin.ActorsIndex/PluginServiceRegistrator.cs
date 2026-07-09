@@ -15,6 +15,7 @@ public class PluginServiceRegistrator : IPluginServiceRegistrator
     {
         serviceCollection.AddSingleton<ActorsIndexService>();
         serviceCollection.AddHostedService<PluginPagesRegistrationService>();
+        serviceCollection.AddHostedService<FileTransformationRegistrationService>();
 
         // Note: the IChannel registration for ActorsIndexChannel has been intentionally
         // removed. Jellyfin's native Channel browsing UI cannot be restyled by the plugin,

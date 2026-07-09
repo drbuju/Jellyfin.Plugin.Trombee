@@ -53,6 +53,8 @@ After installing and restarting Jellyfin:
 > sudo bash -c 'mkdir -p /etc/systemd/system/jellyfin.service.d && printf "[Service]\nExecStartPre=+/bin/chown jellyfin /usr/share/jellyfin/web/index.html\n" > /etc/systemd/system/jellyfin.service.d/fix-webroot-perms.conf && systemctl daemon-reload && systemctl restart jellyfin'
 > ```
 > After a Jellyfin update, click **"Inject"** again to restore the button.
+>
+> **Tip:** if you already installed the **File Transformation** plugin (see the section below), none of this is needed — the Home button is injected automatically at serve time, with no file permissions and no re-injecting after updates.
 
 ---
 

@@ -128,7 +128,8 @@
                         <h2 class="sectionTitle">Home Button</h2>
                     </div>
                     <div class="verticalSection">
-                        <p>Adds a persistent &#127914; button on every Jellyfin page that opens Trombee directly. After each Jellyfin update, click "Inject" to restore it.</p>
+                        <p>Adds a persistent &#127914; button on every Jellyfin page that opens Trombee directly.</p>
+                        <p>If the <strong>File Transformation</strong> plugin is installed, the button is injected automatically at every page load &mdash; no need to click anything below, and it survives Jellyfin updates. Without it, use the buttons below to write the button into <code>index.html</code> manually; you'll need to click "Inject" again after each Jellyfin update.</p>
                     </div>
                     <!-- is="emby-button" is required by the Jellyfin web framework -->
                     <button is="emby-button" type="button" id="InjectUiBtn" class="raised emby-button">
