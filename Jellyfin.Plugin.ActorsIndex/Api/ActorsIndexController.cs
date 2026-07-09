@@ -303,7 +303,7 @@ public class ActorsIndexController : ControllerBase
   'use strict';
   var ID='ai-fab';
   function nav(){
-    var p='/configurationpage?name=ActorsBrowse';
+    var p='/configurationpage?name=TrombeeBrowse';
     if(window.Emby&&window.Emby.Page&&window.Emby.Page.show){window.Emby.Page.show(p);}
     else{window.location.hash=p;}
   }

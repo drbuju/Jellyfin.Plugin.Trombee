@@ -52,7 +52,7 @@ public class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages
             },
             new PluginPageInfo
             {
-                Name = "ActorsBrowse",
+                Name = "TrombeeBrowse",
                 DisplayName = "Trombee",
                 EnableInMainMenu = true,
                 MenuSection = "library",
