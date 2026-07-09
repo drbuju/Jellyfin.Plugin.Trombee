@@ -1,7 +1,5 @@
-using Jellyfin.Plugin.Trombee.Channels;
 using Jellyfin.Plugin.Trombee.Services;
 using MediaBrowser.Controller;
-using MediaBrowser.Controller.Channels;
 using MediaBrowser.Controller.Plugins;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -16,6 +14,9 @@ public class PluginServiceRegistrator : IPluginServiceRegistrator
     public void RegisterServices(IServiceCollection serviceCollection, IServerApplicationHost applicationHost)
     {
         serviceCollection.AddSingleton<ActorsIndexService>();
-        serviceCollection.AddSingleton<IChannel, ActorsIndexChannel>();
+
+        // Note: the IChannel registration for ActorsIndexChannel has been intentionally
+        // removed. Jellyfin's native Channel browsing UI cannot be restyled by the plugin,
+        // so Trombee relies solely on its own custom page (actorsBrowse.html) instead.
     }
 }
