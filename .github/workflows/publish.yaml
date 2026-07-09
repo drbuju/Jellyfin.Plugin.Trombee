@@ -1,0 +1,17 @@
+name: '🚀 Publish Plugin'
+
+# This workflow publishes to the official Jellyfin catalog.
+# Disabled: plugin is distributed via manifest.json in this repository.
+on:
+  workflow_dispatch:
+    inputs:
+      disabled:
+        description: 'Not used'
+        required: false
+
+jobs:
+  placeholder:
+    runs-on: ubuntu-latest
+    if: false
+    steps:
+      - run: echo "disabled"
