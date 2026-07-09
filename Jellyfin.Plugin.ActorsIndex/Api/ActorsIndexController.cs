@@ -23,10 +23,10 @@ namespace Jellyfin.Plugin.ActorsIndex.Api;
 /// Simple API for Actors Index.
 /// </summary>
 [ApiController]
-[Route("ActorsIndex")]
+[Route("Trombee")]
 public class ActorsIndexController : ControllerBase
 {
-    private const string InjectionTag = "\n    <!-- ActorsIndex --><script src=\"/ActorsIndex/ui-button.js\"></script><!-- /ActorsIndex -->";
+    private const string InjectionTag = "\n    <!-- Trombee --><script src=\"/Trombee/ui-button.js\"></script><!-- /Trombee -->";
     private const string PluginManifestUrl = "https://raw.githubusercontent.com/drbuju/Jellyfin.Plugin.Trombee/main/manifest.json";
 
     private static readonly string[] WebRootCandidates =
@@ -252,7 +252,7 @@ public class ActorsIndexController : ControllerBase
         }
 
         var html = System.IO.File.ReadAllText(indexPath);
-        if (html.Contains("<!-- ActorsIndex -->", StringComparison.Ordinal))
+        if (html.Contains("<!-- Trombee -->", StringComparison.Ordinal))
         {
             return Ok(new { status = "already_injected", path = indexPath });
         }
@@ -281,7 +281,7 @@ public class ActorsIndexController : ControllerBase
         }
 
         var html = System.IO.File.ReadAllText(indexPath);
-        if (!html.Contains("<!-- ActorsIndex -->", StringComparison.Ordinal))
+        if (!html.Contains("<!-- Trombee -->", StringComparison.Ordinal))
         {
             return Ok(new { status = "not_injected" });
         }

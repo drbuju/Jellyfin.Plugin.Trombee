@@ -220,7 +220,7 @@
                 restartBtn.classList.add('ai-hidden-btn');
                 statusEl.textContent = 'Checking\u2026';
 
-                fetch(ApiClient.getUrl('ActorsIndex/check-update'), {
+                fetch(ApiClient.getUrl('Trombee/check-update'), {
                     headers: { 'X-Emby-Authorization': 'MediaBrowser Token="' + ApiClient.accessToken() + '"' }
                 })
                 .then(function (r) { return r.json(); })
@@ -249,7 +249,7 @@
                 btn.disabled = true;
                 statusEl.textContent = 'Downloading and installing\u2026';
 
-                fetch(ApiClient.getUrl('ActorsIndex/self-update'), {
+                fetch(ApiClient.getUrl('Trombee/self-update'), {
                     method: 'POST',
                     headers: { 'X-Emby-Authorization': 'MediaBrowser Token="' + ApiClient.accessToken() + '"' }
                 })
@@ -311,7 +311,7 @@
                 btn.disabled = true;
                 statusEl.textContent = 'Working\u2026';
 
-                fetch(ApiClient.getUrl('ActorsIndex/inject-ui'), {
+                fetch(ApiClient.getUrl('Trombee/inject-ui'), {
                     method: 'POST',
                     headers: { 'X-Emby-Authorization': 'MediaBrowser Token="' + ApiClient.accessToken() + '"' }
                 })
@@ -351,7 +351,7 @@
                 btn.disabled = true;
                 statusEl.textContent = 'Removing\u2026';
 
-                fetch(ApiClient.getUrl('ActorsIndex/remove-ui'), {
+                fetch(ApiClient.getUrl('Trombee/remove-ui'), {
                     method: 'POST',
                     headers: { 'X-Emby-Authorization': 'MediaBrowser Token="' + ApiClient.accessToken() + '"' }
                 })
@@ -378,7 +378,7 @@
                 btn.disabled = true;
                 statusEl.textContent = 'Working\u2026';
 
-                fetch(ApiClient.getUrl('ActorsIndex/refresh-channel'), {
+                fetch(ApiClient.getUrl('Trombee/refresh-channel'), {
                     method: 'POST',
                     headers: { 'X-Emby-Authorization': 'MediaBrowser Token="' + ApiClient.accessToken() + '"' }
                 })
@@ -402,7 +402,7 @@
                 btn.disabled = true;
                 statusEl.textContent = 'Working\u2026';
 
-                fetch(ApiClient.getUrl('ActorsIndex/refresh-people'), {
+                fetch(ApiClient.getUrl('Trombee/refresh-people'), {
                     method: 'POST',
                     headers: { 'X-Emby-Authorization': 'MediaBrowser Token="' + ApiClient.accessToken() + '"' }
                 })
@@ -437,7 +437,7 @@
                 tableBody.innerHTML = '';
 
                 ApiClient.ajax({
-                    url: ApiClient.getUrl('ActorsIndex/actors-index'),
+                    url: ApiClient.getUrl('Trombee/actors-index'),
                     type: 'GET',
                     dataType: 'json'
                 }).then(function (result) {
