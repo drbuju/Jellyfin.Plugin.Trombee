@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Net.Http;
@@ -9,8 +8,6 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Jellyfin.Plugin.Trombee.Configuration;
 using Jellyfin.Plugin.Trombee.Services;
-using MediaBrowser.Common.Configuration;
-using MediaBrowser.Controller.Channels;
 using MediaBrowser.Controller.Library;
 using MediaBrowser.Controller.Providers;
 using MediaBrowser.Model.IO;
@@ -43,7 +40,6 @@ public class ActorsIndexController : ControllerBase
     private readonly IUserManager _userManager;
     private readonly IProviderManager _providerManager;
     private readonly IFileSystem _fileSystem;
-    private readonly IApplicationPaths _appPaths;
     private readonly IHttpClientFactory _httpClientFactory;
 
     /// <summary>
@@ -54,7 +50,6 @@ public class ActorsIndexController : ControllerBase
     /// <param name="userManager">The user manager.</param>
     /// <param name="providerManager">The provider manager.</param>
     /// <param name="fileSystem">The file system.</param>
-    /// <param name="appPaths">The application paths.</param>
     /// <param name="httpClientFactory">The HTTP client factory.</param>
     public ActorsIndexController(
         ActorsIndexService actorsIndexService,
@@ -62,7 +57,6 @@ public class ActorsIndexController : ControllerBase
         IUserManager userManager,
         IProviderManager providerManager,
         IFileSystem fileSystem,
-        IApplicationPaths appPaths,
         IHttpClientFactory httpClientFactory)
     {
         _actorsIndexService = actorsIndexService;
@@ -70,7 +64,6 @@ public class ActorsIndexController : ControllerBase
         _userManager = userManager;
         _providerManager = providerManager;
         _fileSystem = fileSystem;
-        _appPaths = appPaths;
         _httpClientFactory = httpClientFactory;
     }
 
@@ -166,56 +159,6 @@ public class ActorsIndexController : ControllerBase
     public ActionResult<object> GetLibraryStats()
     {
         return Ok(_actorsIndexService.GetLibraryStats());
-    }
-
-    /// <summary>
-    /// Deletes all channel items from the DB and clears the disk cache so they are
-    /// recreated from scratch on the next channel browse (picking up refreshed images).
-    /// </summary>
-    /// <returns>A summary of the operations performed.</returns>
-    [HttpPost("refresh-channel")]
-    [Authorize(Policy = "RequiresElevation")]
-    public ActionResult<object> RefreshChannel()
-    {
-        // 1. Compute the channel internal ID
-        var channelId = _libraryManager.GetNewItemId("Channel Trombee", typeof(Channel));
-
-        // 2. Delete ALL channel items from the DB so they are recreated fresh.
-        //    ImageUrl is only written once (on first creation); deletion is the only way
-        //    to force Jellyfin to re-read the current Person/Movie image paths.
-        var items = _libraryManager.GetItemList(new MediaBrowser.Controller.Entities.InternalItemsQuery
-        {
-            ChannelIds = new[] { channelId },
-        });
-
-        var deleteOpts = new MediaBrowser.Controller.Library.DeleteOptions
-        {
-            DeleteFileLocation = false,
-        };
-
-        foreach (var item in items)
-        {
-            _libraryManager.DeleteItem(item, deleteOpts);
-        }
-
-        // 3. Delete the disk cache so Jellyfin re-calls GetChannelItems immediately.
-        var cacheDir = Path.Combine(
-            _appPaths.CachePath,
-            "channels",
-            channelId.ToString("N", CultureInfo.InvariantCulture));
-        var cacheCleared = false;
-        if (Directory.Exists(cacheDir))
-        {
-            Directory.Delete(cacheDir, recursive: true);
-            cacheCleared = true;
-        }
-
-        return Ok(new
-        {
-            cacheCleared,
-            itemsDeleted = items.Count,
-            channelId = channelId.ToString("N", CultureInfo.InvariantCulture),
-        });
     }
 
     /// <summary>

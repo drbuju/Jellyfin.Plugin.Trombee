@@ -84,21 +84,16 @@
                     </div>
                 </form>
 
-                <!-- ===== Channel Tools ===== -->
+                <!-- ===== Actor Images ===== -->
                 <div class="verticalSection ai-section">
                     <div class="sectionTitleContainer flex align-items-center">
-                        <h2 class="sectionTitle">Channel Tools</h2>
+                        <h2 class="sectionTitle">Actor Images</h2>
                     </div>
                     <div class="verticalSection">
-                        <p>Deletes all channel items from the database and clears the cache. Jellyfin will rebuild them from scratch on the next browse, using the actors' refreshed images.</p>
+                        <p>Forces Jellyfin to re-download images and metadata for every actor in your library, so the Trombee grid shows up-to-date photos.</p>
                     </div>
                     <!-- is="emby-button" is required by the Jellyfin web framework -->
-                    <button is="emby-button" type="button" id="RefreshChannelBtn" class="raised emby-button">
-                        <span>&#128260; Refresh channel metadata</span>
-                    </button>
-                    <div id="RefreshChannelStatus" class="ai-status"></div>
-                    <!-- is="emby-button" is required by the Jellyfin web framework -->
-                    <button is="emby-button" type="button" id="RefreshPeopleBtn" class="raised emby-button ai-load-btn">
+                    <button is="emby-button" type="button" id="RefreshPeopleBtn" class="raised emby-button">
                         <span>&#128247; Refresh actor images</span>
                     </button>
                     <div id="RefreshPeopleStatus" class="ai-status"></div>
@@ -405,30 +400,6 @@
                 });
             });
 
-            document.getElementById('RefreshChannelBtn').addEventListener('click', function () {
-                var btn = this;
-                var statusEl = document.getElementById('RefreshChannelStatus');
-                btn.disabled = true;
-                statusEl.textContent = 'Working\u2026';
-
-                fetch(ApiClient.getUrl('Trombee/refresh-channel'), {
-                    method: 'POST',
-                    headers: { 'X-Emby-Authorization': 'MediaBrowser Token="' + ApiClient.accessToken() + '"' }
-                })
-                .then(function (r) { return r.json(); })
-                .then(function (data) {
-                    statusEl.textContent =
-                        '\u2714 Items deleted from DB: ' + data.itemsDeleted +
-                        ' \u2014 Cache cleared: ' + (data.cacheCleared ? 'yes' : 'no') +
-                        '. Items will be recreated from scratch on the next channel browse.';
-                    btn.disabled = false;
-                })
-                .catch(function () {
-                    statusEl.textContent = '\u2716 Error during refresh. Check the browser console.';
-                    btn.disabled = false;
-                });
-            });
-
             document.getElementById('RefreshPeopleBtn').addEventListener('click', function () {
                 var btn = this;
                 var statusEl = document.getElementById('RefreshPeopleStatus');
@@ -480,7 +451,7 @@
                     result.actors.forEach(function (actor) {
                         var shownItems = actor.items.slice(0, maxItems);
                         var titlesHtml = shownItems.map(function (i) {
-                            var url = ApiClient.serverAddress() + '/web/index.html#!/details?id=' + i.itemId;
+                            var url = ApiClient.serverAddress() + '/web/index.html#/details?id=' + i.itemId;
                             var label = escapeHtml(i.itemName) + (i.role ? ' <em>(' + escapeHtml(i.role) + ')</em>' : '');
                             return '<a href="' + url + '" class="ai-link">' + label + '</a>';
                         }).join(', ');
