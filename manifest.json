@@ -4,33 +4,17 @@
     "guid": "c6d7356a-44b3-4a91-a86c-932d633b51b1",
     "imageUrl": "https://raw.githubusercontent.com/drbuju/Jellyfin.Plugin.Trombee/main/Jellyfin.Plugin.ActorsIndex/Images/thumb.png",
     "name": "Trombee",
-    "description": "Scans your Jellyfin library and builds an index of all actors with a photo grid, search, pagination and an injectable Home button.",
+    "description": "Scans your Jellyfin library and builds an index of all actors with a photo grid, search and pagination.",
     "overview": "Browse all actors in your library with appearance counts.",
     "owner": "drbuju",
     "versions": [
       {
-        "version": "1.0.0.2",
+        "version": "1.0.1.1",
         "changelog": "Auto-release: built for Jellyfin 10.11.8.",
         "targetAbi": "10.11.0.0",
-        "sourceUrl": "https://github.com/drbuju/Jellyfin.Plugin.Trombee/releases/download/v1.0.0.2/Jellyfin.Plugin.Trombee_1.0.0.2.zip",
-        "checksum": "519c114af7cd999400273c21859a57cb",
-        "timestamp": "2026-05-17T19:58:29Z"
-      },
-      {
-        "version": "1.0.0.1",
-        "changelog": "Auto-release: built for Jellyfin 10.11.8.",
-        "targetAbi": "10.11.0.0",
-        "sourceUrl": "https://github.com/drbuju/Jellyfin.Plugin.Trombee/releases/download/v1.0.0.1/Jellyfin.Plugin.Trombee_1.0.0.1.zip",
-        "checksum": "28e8dc6e7b31c168c6f309d70392d0d2",
-        "timestamp": "2026-05-07T20:31:26Z"
-      },
-      {
-        "version": "1.0.0.0",
-        "changelog": "Initial public release.",
-        "targetAbi": "10.11.0.0",
-        "sourceUrl": "https://github.com/drbuju/Jellyfin.Plugin.Trombee/releases/download/v1.0.0.0/Jellyfin.Plugin.Trombee_1.0.0.0.zip",
-        "checksum": "2a1b6b2199f1b4db5494acd86fa3e74e",
-        "timestamp": "2026-04-04T00:00:00.0000000Z"
+        "sourceUrl": "https://github.com/drbuju/Jellyfin.Plugin.Trombee/releases/download/v1.0.0.18/Jellyfin.Plugin.Trombee_1.0.0.18.zip",
+        "checksum": "d6dcee9567cf5e080ffb9fd1bc6db9d5",
+        "timestamp": "2026-07-09T11:11:00Z"
       }
     ]
   }
