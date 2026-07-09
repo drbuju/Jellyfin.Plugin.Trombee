@@ -112,6 +112,29 @@ public class ActorsIndexController : ControllerBase
     }
 
     /// <summary>
+    /// Serves the actors browse page as plain HTML, reachable by any authenticated user
+    /// (not just administrators). Used as the target URL registered with the Plugin Pages
+    /// plugin, so that regular users can access it outside the admin Dashboard.
+    /// </summary>
+    /// <returns>The browse page HTML.</returns>
+    [HttpGet("Pages/Browse")]
+    public ActionResult GetBrowsePage()
+    {
+        var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+        const string resourceName = "Jellyfin.Plugin.Trombee.Configuration.actorsBrowse.html";
+
+        using var stream = assembly.GetManifestResourceStream(resourceName);
+        if (stream is null)
+        {
+            return NotFound("Browse page resource not found.");
+        }
+
+        using var reader = new StreamReader(stream);
+        var html = reader.ReadToEnd();
+        return Content(html, "text/html");
+    }
+
+    /// <summary>
     /// Returns the actors index with appearance counts.
     /// </summary>
     /// <returns>Sorted list of actors with item occurrences.</returns>

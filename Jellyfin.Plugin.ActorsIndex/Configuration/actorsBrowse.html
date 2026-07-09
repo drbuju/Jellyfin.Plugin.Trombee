@@ -261,7 +261,22 @@
                 ['catch'](function(err){ statusEl.textContent='Error: '+err; });
         }
 
-        $('#ab-page').on('pageshow', init);
+        function initOnce() {
+            var page = document.getElementById('ab-page');
+            if (!page || page._trombeeInitialized) { return; }
+            page._trombeeInitialized = true;
+            init();
+        }
+
+        $('#ab-page').on('pageshow', initOnce);
+        // Fallback: 'pageshow' is a jQuery Mobile event fired by jellyfin-web's own page
+        // navigation. When this page is instead loaded through the Plugin Pages plugin
+        // (for non-admin users), that event may not fire, so we also bootstrap on
+        // DOMContentLoaded, guarded above to avoid running init() twice.
+        document.addEventListener('DOMContentLoaded', initOnce);
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            initOnce();
+        }
 
     }());
     </script>
