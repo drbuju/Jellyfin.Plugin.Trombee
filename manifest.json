@@ -9,6 +9,14 @@
     "owner": "drbuju",
     "versions": [
       {
+        "version": "1.0.0.6",
+        "changelog": "Auto-release: built for Jellyfin 10.11.8.",
+        "targetAbi": "10.11.0.0",
+        "sourceUrl": "https://github.com/drbuju/Jellyfin.Plugin.Trombee/releases/download/v1.0.0.6/Jellyfin.Plugin.ActorsIndex_1.0.0.6.zip",
+        "checksum": "72f1dcf27d5b88f7df74a4aca10e511a",
+        "timestamp": "2026-07-09T06:06:48Z"
+      },
+      {
         "version": "1.0.0.5",
         "changelog": "Auto-release: built for Jellyfin 10.11.8.",
         "targetAbi": "10.11.0.0",
