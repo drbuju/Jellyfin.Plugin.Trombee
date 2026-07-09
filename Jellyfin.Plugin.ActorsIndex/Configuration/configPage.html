@@ -186,14 +186,47 @@
                 pluginUniqueId: 'c6d7356a-44b3-4a91-a86c-932d633b51b1'
             };
 
+            function trombeeShowAccessDenied() {
+                var page = document.getElementById('ActorsIndexConfigPage');
+                if (!page || page._trombeeAccessChecked) { return; }
+                page._trombeeAccessChecked = true;
+                page.innerHTML =
+                    '<div data-role="content"><div class="content-primary">' +
+                    '<div class="sectionTitleContainer flex align-items-center"><h2 class="sectionTitle">Trombee</h2></div>' +
+                    '<div class="verticalSection"><p>This page is only available to server administrators.</p></div>' +
+                    '</div></div>';
+            }
+
+            function trombeeCheckAccessThen(onAllowed) {
+                var page = document.getElementById('ActorsIndexConfigPage');
+                if (page && page._trombeeAccessChecked) { return; }
+                try {
+                    ApiClient.getCurrentUser().then(function (user) {
+                        var isAdmin = !!(user && user.Policy && user.Policy.IsAdministrator);
+                        if (!isAdmin) { trombeeShowAccessDenied(); return; }
+                        if (page) { page._trombeeAccessChecked = true; }
+                        onAllowed();
+                    })['catch'](function () { trombeeShowAccessDenied(); });
+                } catch (e) {
+                    trombeeShowAccessDenied();
+                }
+            }
+
             $('#ActorsIndexConfigPage').on('pageshow', function () {
-                Dashboard.showLoadingMsg();
-                ApiClient.getPluginConfiguration(ActorsIndexConfig.pluginUniqueId).then(function (config) {
-                    document.getElementById('Enabled').checked = config.Enabled ?? true;
-                    document.getElementById('MinimumAppearances').value = config.MinimumAppearances ?? 1;
-                    document.getElementById('ShowRoleName').checked = config.ShowRoleName ?? true;
-                    Dashboard.hideLoadingMsg();
+                trombeeCheckAccessThen(function () {
+                    Dashboard.showLoadingMsg();
+                    ApiClient.getPluginConfiguration(ActorsIndexConfig.pluginUniqueId).then(function (config) {
+                        document.getElementById('Enabled').checked = config.Enabled ?? true;
+                        document.getElementById('MinimumAppearances').value = config.MinimumAppearances ?? 1;
+                        document.getElementById('ShowRoleName').checked = config.ShowRoleName ?? true;
+                        Dashboard.hideLoadingMsg();
+                    });
                 });
+            });
+            // Fallback in case this page is loaded outside the native Dashboard pageshow
+            // lifecycle (e.g. through the Plugin Pages plugin's generic user-page mechanism).
+            document.addEventListener('DOMContentLoaded', function () {
+                trombeeCheckAccessThen(function () { /* native pageshow handler above covers normal init */ });
             });
 
             $('#ActorsIndexConfigForm').on('submit', function () {

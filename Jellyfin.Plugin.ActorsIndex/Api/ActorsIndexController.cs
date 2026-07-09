@@ -160,6 +160,7 @@ public class ActorsIndexController : ControllerBase
     /// </summary>
     /// <returns>A summary of the operations performed.</returns>
     [HttpPost("refresh-channel")]
+    [Authorize(Policy = "RequiresElevation")]
     public ActionResult<object> RefreshChannel()
     {
         // 1. Compute the channel internal ID
@@ -266,6 +267,7 @@ public class ActorsIndexController : ControllerBase
     /// </summary>
     /// <returns>Operation result.</returns>
     [HttpPost("inject-ui")]
+    [Authorize(Policy = "RequiresElevation")]
     public ActionResult InjectUi()
     {
         var indexPath = FindIndexHtml();
@@ -295,6 +297,7 @@ public class ActorsIndexController : ControllerBase
     /// </summary>
     /// <returns>Operation result.</returns>
     [HttpPost("remove-ui")]
+    [Authorize(Policy = "RequiresElevation")]
     public ActionResult RemoveUi()
     {
         var indexPath = FindIndexHtml();
@@ -366,6 +369,7 @@ public class ActorsIndexController : ControllerBase
     /// </summary>
     /// <returns>A summary of the operation.</returns>
     [HttpPost("refresh-people")]
+    [Authorize(Policy = "RequiresElevation")]
     public ActionResult<object> RefreshPeople()
     {
         var people = _libraryManager.GetItemList(new MediaBrowser.Controller.Entities.InternalItemsQuery
@@ -400,6 +404,7 @@ public class ActorsIndexController : ControllerBase
     /// </summary>
     /// <returns>Version comparison result.</returns>
     [HttpGet("check-update")]
+    [Authorize(Policy = "RequiresElevation")]
     public async Task<ActionResult> CheckUpdate()
     {
         try
@@ -443,6 +448,7 @@ public class ActorsIndexController : ControllerBase
     /// </summary>
     /// <returns>Update result.</returns>
     [HttpPost("self-update")]
+    [Authorize(Policy = "RequiresElevation")]
     public async Task<ActionResult> SelfUpdate()
     {
         var tempDir = Path.Combine(Path.GetTempPath(), "actorsindex_upd_" + Guid.NewGuid().ToString("N"));

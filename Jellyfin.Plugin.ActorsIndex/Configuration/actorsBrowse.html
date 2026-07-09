@@ -245,6 +245,22 @@
                 if (window.Emby && window.Emby.Page && window.Emby.Page.show) { window.Emby.Page.show(p); }
                 else { window.location.hash = p; }
             });
+            try {
+                ApiClient.getCurrentUser().then(function (user) {
+                    var isAdmin = !!(user && user.Policy && user.Policy.IsAdministrator);
+                    if (!isAdmin) {
+                        var btn = document.getElementById('ab-settings-link');
+                        if (btn) { btn.style.display = 'none'; }
+                    }
+                })['catch'](function () {
+                    // If we can't confirm admin status, hide the button to be safe.
+                    var btn = document.getElementById('ab-settings-link');
+                    if (btn) { btn.style.display = 'none'; }
+                });
+            } catch (e) {
+                var btn = document.getElementById('ab-settings-link');
+                if (btn) { btn.style.display = 'none'; }
+            }
             setGridOffset();
             window.addEventListener('resize', setGridOffset);
 
