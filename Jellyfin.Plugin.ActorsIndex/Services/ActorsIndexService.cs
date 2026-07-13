@@ -110,7 +110,7 @@ public class ActorsIndexService
         }
 
         // Build actor-to-items mapping by querying people for each item
-        var actorDict = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.List<(System.Guid ItemId, string ItemName, string? Role)>>(
+        var actorDict = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.List<(System.Guid ItemId, string ItemName, string? Role, int? Year, string ItemType)>>(
             System.StringComparer.OrdinalIgnoreCase);
 
         foreach (var item in items)
@@ -124,11 +124,11 @@ public class ActorsIndexService
 
                 if (!actorDict.TryGetValue(person.Name, out var appearances))
                 {
-                    appearances = new System.Collections.Generic.List<(System.Guid, string, string?)>();
+                    appearances = new System.Collections.Generic.List<(System.Guid, string, string?, int?, string)>();
                     actorDict[person.Name] = appearances;
                 }
 
-                appearances.Add((item.Id, item.Name, person.Role));
+                appearances.Add((item.Id, item.Name, person.Role, item.ProductionYear, item.GetType().Name));
             }
         }
 
@@ -149,7 +149,7 @@ public class ActorsIndexService
                     appearances = kvp.Value.Count,
                     personId,
                     items = kvp.Value
-                        .Select(x => new { itemId = x.ItemId, itemName = x.ItemName, role = x.Role })
+                        .Select(x => new { itemId = x.ItemId, itemName = x.ItemName, role = x.Role, year = x.Year, itemType = x.ItemType })
                         .ToArray()
                 };
             })
