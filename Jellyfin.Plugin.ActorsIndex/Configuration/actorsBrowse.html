@@ -48,6 +48,19 @@
     .ab-sort-btn.active { background: #0097e6; border-color: #0097e6; color: #fff; }
     .ab-type-select { padding: 8px 12px; border-radius: 4px; background: #2a2a2a; border: 1px solid #555; color: #ccc; font-size: 0.95em; }
     .ab-type-select:focus { outline: 2px solid #0097e6; border-color: #0097e6; }
+    .ab-lib-wrap { position: relative; display: inline-block; }
+    .ab-lib-panel {
+        display: none; position: absolute; top: calc(100% + 6px); left: 0; z-index: 200;
+        background: #222; border: 1px solid #555; border-radius: 6px; padding: 10px 14px;
+        min-width: 220px; max-height: 320px; overflow-y: auto; box-shadow: 0 4px 14px rgba(0,0,0,0.5);
+        text-align: left;
+    }
+    .ab-lib-panel.open { display: block; }
+    .ab-lib-row { display: flex; align-items: center; gap: 8px; padding: 5px 0; font-size: 0.95em; color: #ddd; white-space: nowrap; }
+    .ab-lib-row label { cursor: pointer; flex: 1; }
+    .ab-lib-row input[type="checkbox"] { cursor: pointer; }
+    .ab-lib-sep { border-top: 1px solid #444; margin: 6px 0; }
+    .ab-lib-all-row { font-weight: bold; }
     .ab-sort-btn:hover:not(.active) { background: #383838; }
 
     /* Grid — exactly 7 columns */
@@ -118,6 +131,10 @@
                 <option value="Editor">Editor</option>
                 <option value="Translator">Translator</option>
             </select>
+            <div id="ab-lib-wrap" class="ab-lib-wrap">
+                <button class="ab-sort-btn" id="ab-lib-btn" type="button">&#128193; Libraries: All</button>
+                <div id="ab-lib-panel" class="ab-lib-panel"></div>
+            </div>
             <button class="ab-sort-btn active" id="ab-sort-app">Appearances &#8595;</button>
             <button class="ab-sort-btn" id="ab-sort-name">Name A&#8594;Z</button>
         </div>
@@ -276,6 +293,17 @@
             document.getElementById('ab-type-select').addEventListener('change', function () {
                 loadData();
             });
+            document.getElementById('ab-lib-btn').addEventListener('click', function (e) {
+                e.stopPropagation();
+                document.getElementById('ab-lib-panel').classList.toggle('open');
+            });
+            document.addEventListener('click', function (e) {
+                var wrap = document.getElementById('ab-lib-wrap');
+                if (wrap && !wrap.contains(e.target)) {
+                    document.getElementById('ab-lib-panel').classList.remove('open');
+                }
+            });
+            loadLibraries();
             try {
                 ApiClient.getCurrentUser().then(function (user) {
                     var isAdmin = !!(user && user.Policy && user.Policy.IsAdministrator);
@@ -298,6 +326,74 @@
             loadData();
         }
 
+        function loadLibraries() {
+            var url = ApiClient.getUrl('Trombee/libraries');
+            fetch(url, { headers: { 'X-Emby-Authorization': 'MediaBrowser Token="'+ApiClient.accessToken()+'"' } })
+                .then(function(r){ if(!r.ok){throw new Error('HTTP '+r.status);} return r.json(); })
+                .then(function(result){
+                    var libs = (result && result.libraries) || [];
+                    var panel = document.getElementById('ab-lib-panel');
+                    if (libs.length === 0) {
+                        document.getElementById('ab-lib-wrap').style.display = 'none';
+                        return;
+                    }
+                    var html = '<div class="ab-lib-row ab-lib-all-row">' +
+                        '<input type="checkbox" id="ab-lib-all" checked>' +
+                        '<label for="ab-lib-all">All libraries</label></div>' +
+                        '<div class="ab-lib-sep"></div>';
+                    libs.forEach(function (lib) {
+                        html += '<div class="ab-lib-row">' +
+                            '<input type="checkbox" class="ab-lib-item" value="' + esc(lib.id) + '" checked>' +
+                            '<label for="ab-lib-' + esc(lib.id) + '">' + esc(lib.name) + '</label></div>';
+                    });
+                    panel.innerHTML = html;
+
+                    var allBox = document.getElementById('ab-lib-all');
+                    var itemBoxes = panel.querySelectorAll('.ab-lib-item');
+
+                    allBox.addEventListener('change', function () {
+                        itemBoxes.forEach(function (cb) { cb.checked = allBox.checked; });
+                        updateLibButtonLabel();
+                        loadData();
+                    });
+                    itemBoxes.forEach(function (cb) {
+                        cb.addEventListener('change', function () {
+                            var allChecked = Array.prototype.every.call(itemBoxes, function (c) { return c.checked; });
+                            allBox.checked = allChecked;
+                            updateLibButtonLabel();
+                            loadData();
+                        });
+                    });
+                })
+                ['catch'](function () {
+                    document.getElementById('ab-lib-wrap').style.display = 'none';
+                });
+        }
+
+        function updateLibButtonLabel() {
+            var panel = document.getElementById('ab-lib-panel');
+            var itemBoxes = panel.querySelectorAll('.ab-lib-item');
+            var checked = Array.prototype.filter.call(itemBoxes, function (c) { return c.checked; });
+            var btn = document.getElementById('ab-lib-btn');
+            if (checked.length === 0 || checked.length === itemBoxes.length) {
+                btn.textContent = '\uD83D\uDCC1 Libraries: All';
+            } else if (checked.length === 1) {
+                btn.textContent = '\uD83D\uDCC1 ' + checked[0].nextElementSibling.textContent;
+            } else {
+                btn.textContent = '\uD83D\uDCC1 Libraries: ' + checked.length + ' selected';
+            }
+        }
+
+        function getSelectedLibraryIds() {
+            var panel = document.getElementById('ab-lib-panel');
+            if (!panel) { return null; }
+            var itemBoxes = panel.querySelectorAll('.ab-lib-item');
+            if (itemBoxes.length === 0) { return null; }
+            var checked = Array.prototype.filter.call(itemBoxes, function (c) { return c.checked; });
+            if (checked.length === 0 || checked.length === itemBoxes.length) { return null; }
+            return checked.map(function (c) { return c.value; }).join(',');
+        }
+
         function loadData() {
             var typeSelect = document.getElementById('ab-type-select');
             var personType = typeSelect ? typeSelect.value : 'Actor';
@@ -307,7 +403,11 @@
             statusEl.textContent = 'Loading\u2026';
             document.getElementById('ab-search').placeholder = 'Search ' + typeLabel.toLowerCase() + '\u2026';
 
-            var url = ApiClient.getUrl('Trombee/actors-index', { personType: personType });
+            var params = { personType: personType };
+            var libraryIds = getSelectedLibraryIds();
+            if (libraryIds) { params.libraryIds = libraryIds; }
+
+            var url = ApiClient.getUrl('Trombee/actors-index', params);
             fetch(url, { headers: { 'X-Emby-Authorization': 'MediaBrowser Token="'+ApiClient.accessToken()+'"' } })
                 .then(function(r){ if(!r.ok){throw new Error('HTTP '+r.status);} return r.json(); })
                 .then(function(result){

@@ -37,24 +37,58 @@ public class ActorsIndexService
     }
 
     /// <summary>
+    /// Returns the top-level libraries (folders) visible to the given user, respecting
+    /// their library access permissions. Pass <c>null</c> to return every library.
+    /// </summary>
+    /// <param name="user">The user to scope the results to, or <c>null</c> for no scoping.</param>
+    /// <returns>A list of libraries with their ID and name.</returns>
+    public object GetLibraries(Jellyfin.Database.Implementations.Entities.User? user = null)
+    {
+        var folders = user is not null
+            ? _libraryManager.GetUserRootFolder().GetChildren(user, true)
+            : _libraryManager.GetUserRootFolder().Children;
+
+        var libraries = folders
+            .Where(f => f is Folder)
+            .Select(f => new
+            {
+                id = f.Id.ToString("N", System.Globalization.CultureInfo.InvariantCulture),
+                name = f.Name
+            })
+            .OrderBy(f => f.name, System.StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        return new { libraries };
+    }
+
+    /// <summary>
     /// Returns the actors index: each person of the given type with their appearance count
     /// and related items, scoped to the libraries the given user has access to. Pass
     /// <c>null</c> user to include everything (used internally / by administrators).
     /// </summary>
     /// <param name="user">The user to scope the results to, or <c>null</c> for no scoping.</param>
     /// <param name="personKind">The type of person to include (defaults to Actor).</param>
+    /// <param name="libraryIds">If provided, restrict results to these top-level library (folder) IDs.</param>
     /// <returns>A sorted list of people with occurrence counts.</returns>
-    public object GetActorsIndex(Jellyfin.Database.Implementations.Entities.User? user = null, PersonKind personKind = PersonKind.Actor)
+    public object GetActorsIndex(Jellyfin.Database.Implementations.Entities.User? user = null, PersonKind personKind = PersonKind.Actor, System.Guid[]? libraryIds = null)
     {
         var config = Plugin.Instance?.Configuration ?? new Configuration.PluginConfiguration();
 
         // Get all movies and series from the library, scoped to what this user can see
-        // (respects library access permissions and parental controls).
-        var items = _libraryManager.GetItemList(new InternalItemsQuery(user)
+        // (respects library access permissions and parental controls), and optionally
+        // restricted to a specific set of libraries the caller selected.
+        var query = new InternalItemsQuery(user)
         {
             IncludeItemTypes = new[] { BaseItemKind.Movie, BaseItemKind.Series },
             Recursive = true
-        });
+        };
+
+        if (libraryIds is { Length: > 0 })
+        {
+            query.ParentIds = libraryIds;
+        }
+
+        var items = _libraryManager.GetItemList(query);
 
         // Build actor-to-items mapping by querying people for each item
         var actorDict = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.List<(System.Guid ItemId, string ItemName, string? Role)>>(

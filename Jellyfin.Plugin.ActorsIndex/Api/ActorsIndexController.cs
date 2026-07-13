@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text.Json;
@@ -125,9 +126,10 @@ public class ActorsIndexController : ControllerBase
     /// Returns the actors index with appearance counts.
     /// </summary>
     /// <param name="personType">The type of person to include (e.g. Actor, Director, Writer). Defaults to Actor.</param>
+    /// <param name="libraryIds">Comma-separated list of library IDs to restrict results to. Omit for all accessible libraries.</param>
     /// <returns>Sorted list of people with item occurrences.</returns>
     [HttpGet("actors-index")]
-    public ActionResult<object> GetActorsIndex([FromQuery] string? personType = null)
+    public ActionResult<object> GetActorsIndex([FromQuery] string? personType = null, [FromQuery] string? libraryIds = null)
     {
         var userId = User.GetUserId();
         var callingUser = userId != Guid.Empty ? _userManager.GetUserById(userId) : null;
@@ -138,7 +140,30 @@ public class ActorsIndexController : ControllerBase
             _ = Enum.TryParse(personType, ignoreCase: true, out personKind);
         }
 
-        return Ok(_actorsIndexService.GetActorsIndex(callingUser, personKind));
+        Guid[]? parsedLibraryIds = null;
+        if (!string.IsNullOrEmpty(libraryIds))
+        {
+            parsedLibraryIds = libraryIds
+                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Select(id => Guid.TryParse(id, out var guid) ? guid : (Guid?)null)
+                .Where(id => id.HasValue)
+                .Select(id => id!.Value)
+                .ToArray();
+        }
+
+        return Ok(_actorsIndexService.GetActorsIndex(callingUser, personKind, parsedLibraryIds));
+    }
+
+    /// <summary>
+    /// Returns the libraries visible to the calling user, for use in the library filter.
+    /// </summary>
+    /// <returns>A list of libraries with their ID and name.</returns>
+    [HttpGet("libraries")]
+    public ActionResult<object> GetLibraries()
+    {
+        var userId = User.GetUserId();
+        var callingUser = userId != Guid.Empty ? _userManager.GetUserById(userId) : null;
+        return Ok(_actorsIndexService.GetLibraries(callingUser));
     }
 
     /// <summary>
