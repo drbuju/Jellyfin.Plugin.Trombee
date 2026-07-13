@@ -77,7 +77,7 @@ public class ActorsIndexService
         // Get all movies and series from the library, scoped to what this user can see
         // (respects library access permissions and parental controls), and optionally
         // restricted to a specific set of libraries the caller selected.
-        System.Collections.Generic.List<BaseItem> items;
+        System.Collections.Generic.IReadOnlyList<BaseItem> items;
         if (libraryIds is { Length: > 0 })
         {
             // Query each selected library individually (via ParentId) and merge, rather than
