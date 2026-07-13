@@ -4,9 +4,18 @@
     "guid": "c6d7356a-44b3-4a91-a86c-932d633b51b1",
     "imageUrl": "https://raw.githubusercontent.com/drbuju/Jellyfin.Plugin.Trombee/main/Jellyfin.Plugin.ActorsIndex/Images/thumb.png",
     "name": "Trombee",
-    "description": "Test channel — builds from the dev branch, not yet merged into main.",
+    "description": "Test channel \u2014 builds from the dev branch, not yet merged into main.",
     "overview": "Pre-release test builds of Trombee.",
     "owner": "drbuju",
-    "versions": []
+    "versions": [
+      {
+        "version": "1.0.1.3",
+        "changelog": "Test build: compiled for Jellyfin 10.11.8 (dev branch).",
+        "targetAbi": "10.11.0.0",
+        "sourceUrl": "https://github.com/drbuju/Jellyfin.Plugin.Trombee/releases/download/test-v1.0.1.3/Jellyfin.Plugin.Trombee-test_1.0.1.3.zip",
+        "checksum": "d94acfa899e13e80927600d85e090fd4",
+        "timestamp": "2026-07-13T05:40:31Z"
+      }
+    ]
   }
 ]
