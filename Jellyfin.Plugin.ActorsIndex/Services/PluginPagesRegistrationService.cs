@@ -102,7 +102,7 @@ public class PluginPagesRegistrationService : IHostedService
 
             idProperty?.SetValue(page, "trombee-browse");
             urlProperty?.SetValue(page, "/Trombee/Pages/Browse");
-            displayTextProperty?.SetValue(page, "Trombee");
+            displayTextProperty?.SetValue(page, "Trombee - Browse Actors");
             iconProperty?.SetValue(page, "people");
 
             var registerMethod = managerInterfaceType.GetMethod("RegisterPluginPage");
