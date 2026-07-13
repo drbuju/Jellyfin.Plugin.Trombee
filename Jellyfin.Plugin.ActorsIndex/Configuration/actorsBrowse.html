@@ -93,7 +93,6 @@
     .ab-modal-poster-placeholder { width: 100%; aspect-ratio: 2/3; border-radius: 5px; background: #252525; display: flex; align-items: center; justify-content: center; font-size: 2em; color: #444; }
     .ab-modal-poster-title { font-size: 0.82em; margin-top: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .ab-modal-poster-year { font-size: 0.75em; color: #888; }
-    .ab-modal-poster-role { font-size: 0.75em; color: #777; font-style: italic; }
     .ab-modal-poster-card:hover .ab-modal-poster-title { color: #0097e6; }
     .ab-role { color: #777; }
 </style>
@@ -201,11 +200,7 @@
             return card;
         }
         function openActor(actor) {
-            if (!actor.personId || getSelectedLibraryIds()) { openModal(actor); return; }
-            var srv=''; try{srv=ApiClient.serverId();}catch(e){}
-            var path='/details?id='+actor.personId+(srv?'&serverId='+srv:'');
-            if (window.Emby&&window.Emby.Page&&window.Emby.Page.show) { window.Emby.Page.show(path); }
-            else { window.location.hash=path; }
+            openModal(actor);
         }
         function updatePager() {
             var total = filteredActors.length;
@@ -296,7 +291,6 @@
                         : '<div class="ab-modal-poster-placeholder">&#127916;</div>') +
                     '<div class="ab-modal-poster-title">'+esc(item.itemName)+'</div>' +
                     (item.year ? '<div class="ab-modal-poster-year">'+item.year+'</div>' : '') +
-                    (item.role ? '<div class="ab-modal-poster-role">'+esc(item.role)+'</div>' : '') +
                     '</a>';
                 list.appendChild(li);
             });
