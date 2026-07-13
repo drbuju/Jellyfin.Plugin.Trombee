@@ -188,7 +188,7 @@
             return card;
         }
         function openActor(actor) {
-            if (!actor.personId) { openModal(actor); return; }
+            if (!actor.personId || getSelectedLibraryIds()) { openModal(actor); return; }
             var srv=''; try{srv=ApiClient.serverId();}catch(e){}
             var path='/details?id='+actor.personId+(srv?'&serverId='+srv:'');
             if (window.Emby&&window.Emby.Page&&window.Emby.Page.show) { window.Emby.Page.show(path); }
@@ -239,7 +239,9 @@
         }
         function openModal(actor) {
             document.getElementById('ab-modal-name').textContent=actor.name;
-            document.getElementById('ab-modal-count').textContent=actor.appearances+' appearance'+(actor.appearances===1?'':'s');
+            var countText = actor.appearances+' appearance'+(actor.appearances===1?'':'s');
+            if (getSelectedLibraryIds()) { countText += ' (filtered by library)'; }
+            document.getElementById('ab-modal-count').textContent=countText;
             var img=document.getElementById('ab-modal-img'), url=personImgUrl(actor.personId);
             img.style.display=url?'':'none'; if(url){img.src=url;}
             var list=document.getElementById('ab-modal-list'); list.innerHTML='';
