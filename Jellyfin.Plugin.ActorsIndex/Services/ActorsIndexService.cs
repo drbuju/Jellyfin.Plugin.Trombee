@@ -87,7 +87,7 @@ public class ActorsIndexService
             {
                 var libraryItems = _libraryManager.GetItemList(new InternalItemsQuery(user)
                 {
-                    IncludeItemTypes = new[] { BaseItemKind.Movie, BaseItemKind.Series },
+                    IncludeItemTypes = new[] { BaseItemKind.Movie, BaseItemKind.Series, BaseItemKind.Episode },
                     Recursive = true,
                     ParentId = libraryId
                 });
@@ -104,13 +104,15 @@ public class ActorsIndexService
         {
             items = _libraryManager.GetItemList(new InternalItemsQuery(user)
             {
-                IncludeItemTypes = new[] { BaseItemKind.Movie, BaseItemKind.Series },
+                IncludeItemTypes = new[] { BaseItemKind.Movie, BaseItemKind.Series, BaseItemKind.Episode },
                 Recursive = true
             });
         }
 
-        // Build actor-to-items mapping by querying people for each item
-        var actorDict = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.List<(System.Guid ItemId, string ItemName, string? Role, int? Year, string ItemType)>>(
+        // Build actor-to-items mapping by querying people for each item. Keyed by item ID
+        // per actor (not a plain list) so that multiple episodes of the same series only
+        // ever produce a single "Series" entry, instead of one per episode.
+        var actorDict = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.Dictionary<System.Guid, (System.Guid ItemId, string ItemName, string? Role, int? Year, string ItemType)>>(
             System.StringComparer.OrdinalIgnoreCase);
 
         // "Actor" includes "Guest Star" credits too, since both represent on-screen
@@ -119,8 +121,40 @@ public class ActorsIndexService
             ? (System.Func<PersonKind, bool>)(t => t == PersonKind.Actor || t == PersonKind.GuestStar)
             : t => t == personKind;
 
+        // Cache resolved series (id -> name/year) so repeated episodes of the same show
+        // don't each trigger a separate lookup.
+        var seriesCache = new System.Collections.Generic.Dictionary<System.Guid, (string Name, int? Year)>();
+
         foreach (var item in items)
         {
+            System.Guid effectiveId;
+            string effectiveName;
+            int? effectiveYear;
+            string effectiveType;
+
+            if (item is Episode episode && episode.SeriesId != System.Guid.Empty)
+            {
+                effectiveId = episode.SeriesId;
+                effectiveType = "Series";
+
+                if (!seriesCache.TryGetValue(episode.SeriesId, out var seriesInfo))
+                {
+                    var seriesItem = _libraryManager.GetItemById(episode.SeriesId);
+                    seriesInfo = (seriesItem?.Name ?? episode.SeriesName ?? item.Name, seriesItem?.ProductionYear);
+                    seriesCache[episode.SeriesId] = seriesInfo;
+                }
+
+                effectiveName = seriesInfo.Name;
+                effectiveYear = seriesInfo.Year;
+            }
+            else
+            {
+                effectiveId = item.Id;
+                effectiveName = item.Name;
+                effectiveYear = item.ProductionYear;
+                effectiveType = item.GetType().Name;
+            }
+
             foreach (var person in _libraryManager.GetPeople(item))
             {
                 if (!matchesRequestedType(person.Type) || person.Name is null)
@@ -130,11 +164,11 @@ public class ActorsIndexService
 
                 if (!actorDict.TryGetValue(person.Name, out var appearances))
                 {
-                    appearances = new System.Collections.Generic.List<(System.Guid, string, string?, int?, string)>();
+                    appearances = new System.Collections.Generic.Dictionary<System.Guid, (System.Guid, string, string?, int?, string)>();
                     actorDict[person.Name] = appearances;
                 }
 
-                appearances.Add((item.Id, item.Name, person.Role, item.ProductionYear, item.GetType().Name));
+                appearances[effectiveId] = (effectiveId, effectiveName, person.Role, effectiveYear, effectiveType);
             }
         }
 
@@ -154,7 +188,7 @@ public class ActorsIndexService
                     name = kvp.Key,
                     appearances = kvp.Value.Count,
                     personId,
-                    items = kvp.Value
+                    items = kvp.Value.Values
                         .Select(x => new { itemId = x.ItemId, itemName = x.ItemName, role = x.Role, year = x.Year, itemType = x.ItemType })
                         .ToArray()
                 };
