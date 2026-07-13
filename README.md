@@ -1,18 +1,23 @@
 # Trombee — Jellyfin Plugin
 
-Browse all the actors in your Jellyfin library on a single screen: a full grid with photos, appearance counts, and a direct link to their biography.
+Browse all the actors in your Jellyfin library on a single screen: a full grid with photos, appearance counts, and a native-style detail view with biography and filmography.
 
-![Trombee screenshot](Jellyfin.Plugin.ActorsIndex/Images/thumb.png)
+![Trombee — actors grid](Jellyfin.Plugin.ActorsIndex/Images/screenshot-grid.jpg)
+
+![Trombee — actor detail](Jellyfin.Plugin.ActorsIndex/Images/screenshot-actor.jpg)
 
 ## Features
 
-- **Actors grid** — all actors/actresses, sortable by number of appearances or name A→Z
+- **Actors grid** — all actors/actresses, sortable by number of appearances or name A→Z, with photos
 - **Real-time search** — filter by name as you type
-- **Person type filter** — switch between Actors, Directors, Writers, and other credited roles
+- **Person type filter** — switch between Actors, Directors, Writers, and other credited roles ("Actor" also includes Guest Star credits)
+- **Library filter** — restrict results to one or more specific libraries, scoped to what you have access to
+- **Native-style actor detail** — click an actor to see their photo, biography, birth date, and a poster grid of their filmography (movies and TV series — episodes are automatically grouped under their parent series)
 - **Pagination** — configurable page size (default 60 actors per page)
 - **Appearance filter** — hide actors with fewer than N appearances
 - **Automatic update** — updates itself from the settings page, no manual build required
 - **Non-admin access** — optionally expose the actors page to all users (not just admins) via Plugin Pages, scoped to each user's library permissions
+- **Internal caching** — results are cached for 10 minutes so repeat visits load instantly, even on large libraries
 
 ## Requirements
 
@@ -34,8 +39,8 @@ Browse all the actors in your Jellyfin library on a single screen: a full grid w
 
 1. Download the latest `Jellyfin.Plugin.Trombee_x.x.x.x.zip` from the [Releases](https://github.com/drbuju/Jellyfin.Plugin.Trombee/releases) page
 2. Extract and copy all the files into Jellyfin's plugin folder:
-   - **Linux**: `/var/lib/jellyfin/plugins/ActorsIndex/`
-   - **Windows**: `%LOCALAPPDATA%\jellyfin\plugins\ActorsIndex\`
+   - **Linux**: `/var/lib/jellyfin/plugins/Trombee/`
+   - **Windows**: `%LOCALAPPDATA%\jellyfin\plugins\Trombee\`
 3. Restart Jellyfin
 
 ---
@@ -74,6 +79,7 @@ The **Settings** button (⚙) inside the actors page is automatically hidden for
 
 - **"Page not found" right after installing Plugin Pages** — your browser likely cached an old version of the Jellyfin web client before Plugin Pages patched it. Do a hard refresh (Ctrl+Shift+R) or clear the site's cache, then try again.
 - **Still not visible** — check **Dashboard → Logs** for a line containing `PluginPagesRegistrationService`; a warning there means Plugin Pages wasn't detected at Trombee's startup (double-check both prerequisite plugins are installed **and** Jellyfin was restarted after installing them, not before).
+- **"Settings" button on the plugin's Dashboard page opens the wrong page** — usually a stale browser cache too; hard-refresh and check again.
 
 ---
 
@@ -88,6 +94,8 @@ If a red error appears when using any of the settings-page actions after a Jelly
 3. Click **"Restart Jellyfin"**
 
 ✅ No terminal, no manual build.
+
+> If the restart button stops the server but doesn't bring it back, that's not Trombee — it's how Jellyfin's own restart API behaves depending on how the server is deployed (systemd, Docker, etc.). Restart it manually from your OS/service manager in that case.
 
 ---
 
