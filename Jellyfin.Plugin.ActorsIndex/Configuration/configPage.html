@@ -131,11 +131,9 @@
                         <p>View all actors present in the library with their appearance counts.</p>
                     </div>
                     <!-- is="emby-button" is required by the Jellyfin web framework -->
-                    <a href="/web/configurationpage?name=TrombeeBrowse"
-                       is="emby-button"
-                       class="raised emby-button ai-browse-link">
+                    <button is="emby-button" type="button" id="OpenTrombeePageBtn" class="raised emby-button ai-browse-link">
                         <span>&#127914; Open Trombee page</span>
-                    </a>
+                    </button>
                     <!-- is="emby-button" is required by the Jellyfin web framework -->
                     <button is="emby-button" type="button" id="LoadActorsIndexBtn" class="raised emby-button ai-load-btn">
                         <span>Load Trombee (below)</span>
@@ -335,6 +333,12 @@
                     statusEl.textContent = '\u2716 Error. Check the browser console.';
                     btn.disabled = false;
                 });
+            });
+
+            document.getElementById('OpenTrombeePageBtn').addEventListener('click', function () {
+                var p = '/configurationpage?name=TrombeeBrowse';
+                if (window.Emby && window.Emby.Page && window.Emby.Page.show) { window.Emby.Page.show(p); }
+                else { window.location.hash = p; }
             });
 
             document.getElementById('LoadActorsIndexBtn').addEventListener('click', function () {
