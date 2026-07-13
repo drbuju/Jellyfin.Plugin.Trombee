@@ -113,11 +113,17 @@ public class ActorsIndexService
         var actorDict = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.List<(System.Guid ItemId, string ItemName, string? Role, int? Year, string ItemType)>>(
             System.StringComparer.OrdinalIgnoreCase);
 
+        // "Actor" includes "Guest Star" credits too, since both represent on-screen
+        // appearances from a user's point of view (guest stars are common on TV series).
+        var matchesRequestedType = personKind == PersonKind.Actor
+            ? (System.Func<PersonKind, bool>)(t => t == PersonKind.Actor || t == PersonKind.GuestStar)
+            : t => t == personKind;
+
         foreach (var item in items)
         {
             foreach (var person in _libraryManager.GetPeople(item))
             {
-                if (person.Type != personKind || person.Name is null)
+                if (!matchesRequestedType(person.Type) || person.Name is null)
                 {
                     continue;
                 }
