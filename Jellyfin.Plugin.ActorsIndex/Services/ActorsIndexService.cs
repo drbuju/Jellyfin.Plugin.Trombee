@@ -85,7 +85,7 @@ public class ActorsIndexService
 
         if (libraryIds is { Length: > 0 })
         {
-            query.ParentIds = libraryIds;
+            query.TopParentIds = libraryIds;
         }
 
         var items = _libraryManager.GetItemList(query);
