@@ -1,0 +1,12 @@
+[
+  {
+    "category": "General",
+    "guid": "c6d7356a-44b3-4a91-a86c-932d633b51b1",
+    "imageUrl": "https://raw.githubusercontent.com/drbuju/Jellyfin.Plugin.Trombee/main/Jellyfin.Plugin.ActorsIndex/Images/thumb.png",
+    "name": "Trombee",
+    "description": "Test channel — builds from the dev branch, not yet merged into main.",
+    "overview": "Pre-release test builds of Trombee.",
+    "owner": "drbuju",
+    "versions": []
+  }
+]
