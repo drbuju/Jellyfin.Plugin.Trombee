@@ -54,9 +54,6 @@ public class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages
             {
                 Name = "TrombeeBrowse",
                 DisplayName = "Trombee - Browse Actors",
-                EnableInMainMenu = true,
-                MenuSection = "library",
-                MenuIcon = "people",
                 EmbeddedResourcePath = string.Format(
                     CultureInfo.InvariantCulture,
                     "{0}.Configuration.actorsBrowse.html",
