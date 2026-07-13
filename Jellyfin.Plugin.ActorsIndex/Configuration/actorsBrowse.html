@@ -343,7 +343,7 @@
                         '<div class="ab-lib-sep"></div>';
                     libs.forEach(function (lib) {
                         html += '<div class="ab-lib-row">' +
-                            '<input type="checkbox" class="ab-lib-item" value="' + esc(lib.id) + '" checked>' +
+                            '<input type="checkbox" id="ab-lib-' + esc(lib.id) + '" class="ab-lib-item" value="' + esc(lib.id) + '" checked>' +
                             '<label for="ab-lib-' + esc(lib.id) + '">' + esc(lib.name) + '</label></div>';
                     });
                     panel.innerHTML = html;

@@ -77,18 +77,37 @@ public class ActorsIndexService
         // Get all movies and series from the library, scoped to what this user can see
         // (respects library access permissions and parental controls), and optionally
         // restricted to a specific set of libraries the caller selected.
-        var query = new InternalItemsQuery(user)
-        {
-            IncludeItemTypes = new[] { BaseItemKind.Movie, BaseItemKind.Series },
-            Recursive = true
-        };
-
+        System.Collections.Generic.List<BaseItem> items;
         if (libraryIds is { Length: > 0 })
         {
-            query.TopParentIds = libraryIds;
-        }
+            // Query each selected library individually (via ParentId) and merge, rather than
+            // relying on TopParentIds — more reliable across Jellyfin versions.
+            var merged = new System.Collections.Generic.Dictionary<System.Guid, BaseItem>();
+            foreach (var libraryId in libraryIds)
+            {
+                var libraryItems = _libraryManager.GetItemList(new InternalItemsQuery(user)
+                {
+                    IncludeItemTypes = new[] { BaseItemKind.Movie, BaseItemKind.Series },
+                    Recursive = true,
+                    ParentId = libraryId
+                });
 
-        var items = _libraryManager.GetItemList(query);
+                foreach (var item in libraryItems)
+                {
+                    merged[item.Id] = item;
+                }
+            }
+
+            items = merged.Values.ToList();
+        }
+        else
+        {
+            items = _libraryManager.GetItemList(new InternalItemsQuery(user)
+            {
+                IncludeItemTypes = new[] { BaseItemKind.Movie, BaseItemKind.Series },
+                Recursive = true
+            });
+        }
 
         // Build actor-to-items mapping by querying people for each item
         var actorDict = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.List<(System.Guid ItemId, string ItemName, string? Role)>>(
