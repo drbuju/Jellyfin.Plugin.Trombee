@@ -299,10 +299,14 @@
                 btn.disabled = true;
                 statusEl.textContent = 'Restarting Jellyfin\u2026';
 
-                fetch(ApiClient.getUrl('System/Restart'), {
-                    method: 'POST',
-                    headers: { 'X-Emby-Authorization': 'MediaBrowser Token="' + ApiClient.accessToken() + '"' }
-                })
+                var restartPromise = (ApiClient.restartServer)
+                    ? ApiClient.restartServer()
+                    : fetch(ApiClient.getUrl('System/Restart'), {
+                        method: 'POST',
+                        headers: { 'X-Emby-Authorization': 'MediaBrowser Token="' + ApiClient.accessToken() + '"' }
+                      });
+
+                restartPromise
                 .then(function () {
                     statusEl.textContent = '\u2714 Restart started. Wait a few seconds and reload the page.';
                 })
