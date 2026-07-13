@@ -246,6 +246,8 @@ public class ActorsIndexController : ControllerBase
             _providerManager.QueueRefresh(person.Id, refreshOpts, RefreshPriority.Normal);
         }
 
+        ActorsIndexService.ClearCache();
+
         return Ok(new
         {
             peopleQueued = people.Count,

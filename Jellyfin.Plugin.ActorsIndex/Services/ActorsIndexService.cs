@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Jellyfin.Data.Enums;
 using MediaBrowser.Controller.Entities;
@@ -12,6 +13,9 @@ namespace Jellyfin.Plugin.Trombee.Services;
 /// </summary>
 public class ActorsIndexService
 {
+    private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(10);
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, (DateTime ComputedAt, object Result)> Cache = new();
+
     private readonly ILibraryManager _libraryManager;
 
     /// <summary>
@@ -71,6 +75,32 @@ public class ActorsIndexService
     /// <param name="libraryIds">If provided, restrict results to these top-level library (folder) IDs.</param>
     /// <returns>A sorted list of people with occurrence counts.</returns>
     public object GetActorsIndex(Jellyfin.Database.Implementations.Entities.User? user = null, PersonKind personKind = PersonKind.Actor, System.Guid[]? libraryIds = null)
+    {
+        var cacheKey = string.Join(
+            '|',
+            user?.Id.ToString() ?? "admin",
+            personKind.ToString(),
+            libraryIds is { Length: > 0 } ? string.Join(',', libraryIds.OrderBy(id => id)) : "all");
+
+        if (Cache.TryGetValue(cacheKey, out var cached) && DateTime.UtcNow - cached.ComputedAt < CacheDuration)
+        {
+            return cached.Result;
+        }
+
+        var result = ComputeActorsIndex(user, personKind, libraryIds);
+        Cache[cacheKey] = (DateTime.UtcNow, result);
+        return result;
+    }
+
+    /// <summary>
+    /// Clears the cached actors index, forcing the next request to recompute it from scratch.
+    /// </summary>
+    public static void ClearCache()
+    {
+        Cache.Clear();
+    }
+
+    private object ComputeActorsIndex(Jellyfin.Database.Implementations.Entities.User? user, PersonKind personKind, System.Guid[]? libraryIds)
     {
         var config = Plugin.Instance?.Configuration ?? new Configuration.PluginConfiguration();
 
