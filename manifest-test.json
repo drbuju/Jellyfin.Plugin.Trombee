@@ -2,20 +2,11 @@
   {
     "category": "General",
     "guid": "c6d7356a-44b3-4a91-a86c-932d633b51b1",
-    "imageUrl": "https://raw.githubusercontent.com/drbuju/Jellyfin.Plugin.Trombee/main/Jellyfin.Plugin.ActorsIndex/Images/thumb.png",
+    "imageUrl": "https://raw.githubusercontent.com/drbuju/Jellyfin.Plugin.Trombee/dev/Jellyfin.Plugin.ActorsIndex/Images/thumb.png",
     "name": "Trombee",
-    "description": "Test channel \u2014 builds from the dev branch, not yet merged into main.",
+    "description": "Test channel — builds from the dev branch, not yet merged into main.",
     "overview": "Pre-release test builds of Trombee.",
     "owner": "drbuju",
-    "versions": [
-      {
-        "version": "1.0.2.16",
-        "changelog": "Test build: compiled for Jellyfin 10.11.8 (dev branch).",
-        "targetAbi": "10.11.0.0",
-        "sourceUrl": "https://github.com/drbuju/Jellyfin.Plugin.Trombee/releases/download/test-v1.0.2.16/Jellyfin.Plugin.Trombee-test_1.0.2.16.zip",
-        "checksum": "87bc1bd4a24c9628fce5ee043ca8e2f4",
-        "timestamp": "2026-07-13T18:48:50Z"
-      }
-    ]
+    "versions": []
   }
 ]
