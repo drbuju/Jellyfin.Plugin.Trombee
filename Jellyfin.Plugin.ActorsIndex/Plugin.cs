@@ -43,15 +43,6 @@ public class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages
         [
             new PluginPageInfo
             {
-                Name = Name,
-                DisplayName = "Trombee - Settings",
-                EmbeddedResourcePath = string.Format(
-                    CultureInfo.InvariantCulture,
-                    "{0}.Configuration.configPage.html",
-                    GetType().Namespace)
-            },
-            new PluginPageInfo
-            {
                 Name = "TrombeeBrowse",
                 DisplayName = "Trombee",
                 EnableInMainMenu = true,
@@ -60,6 +51,15 @@ public class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages
                 EmbeddedResourcePath = string.Format(
                     CultureInfo.InvariantCulture,
                     "{0}.Configuration.actorsBrowse.html",
+                    GetType().Namespace)
+            },
+            new PluginPageInfo
+            {
+                Name = Name,
+                DisplayName = "Trombee - Settings",
+                EmbeddedResourcePath = string.Format(
+                    CultureInfo.InvariantCulture,
+                    "{0}.Configuration.configPage.html",
                     GetType().Namespace)
             }
         ];
