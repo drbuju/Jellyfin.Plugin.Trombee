@@ -120,13 +120,7 @@
     #ab-page .ab-role { color: #777; }
 
     @media (max-width: 767px), (max-width: 1023px) and (max-height: 767px) {
-        .skinHeader .pageTitle.ab-trombee-page-title { display: none; }
         #ab-header { position: relative; top: auto; left: auto; right: auto; padding: 7px 12px 6px; }
-        #ab-compact-title {
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-            min-height: 28px; padding: 2px 0 6px; font-size: 1.05rem; font-weight: 600; line-height: 1.2;
-        }
-        #ab-page .ab-compact-title-icon { font-size: 1.1em; line-height: 1; }
         #ab-search-row { display: flex; flex-wrap: wrap; gap: 6px; }
         #ab-search { display: none; order: 3; flex: 0 0 100%; width: 100%; min-width: 0; height: 42px; font-size: 1rem; }
         #ab-header.filters-open #ab-search { display: block; }
@@ -146,6 +140,15 @@
         #ab-page .ab-card-info { min-height: 50px; padding: 6px 7px; }
         #ab-page .ab-card-name { font-size: 0.8rem; }
         #ab-page .ab-card-count { font-size: 0.72rem; }
+    }
+
+    @media (max-width: 767px) and (orientation: portrait) {
+        .skinHeader .pageTitle.ab-trombee-page-title { display: none; }
+        #ab-compact-title {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            min-height: 28px; padding: 2px 0 6px; font-size: 1.05rem; font-weight: 600; line-height: 1.2;
+        }
+        #ab-page .ab-compact-title-icon { font-size: 1.1em; line-height: 1; }
     }
 
     @media (max-width: 600px) {
