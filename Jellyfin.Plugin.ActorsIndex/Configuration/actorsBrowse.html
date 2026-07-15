@@ -13,7 +13,7 @@
     .content-primary, .padded-top, .padded-left, .padded-right, .padded-bottom {
         padding: 0 !important; max-width: none !important;
     }
-    #ab-header { text-align: center; padding: 14px 16px 10px; position: fixed; top: 60px; left: 0; right: 0; z-index: 150; background: #111; }
+    #ab-header { text-align: center; padding: 14px 16px 10px; position: sticky; top: 0; left: 0; right: 0; z-index: 150; background: #111; }
     #ab-title { font-size: 2.6em; font-weight: bold; display: block; margin-bottom: 16px; }
 
     /* Search + pagination row */
@@ -64,7 +64,7 @@
     .ab-sort-btn:hover:not(.active) { background: #383838; }
 
     /* Grid — responsive: number of columns adapts to available width */
-    #ab-grid { padding: 14px 16px; display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-top: 240px; /* fallback, overridden by JS */ }
+    #ab-grid { padding: 14px 16px; display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; max-width: 1230px; margin: 0 auto; }
     .ab-card { background: #1c1c1c; border-radius: 6px; overflow: hidden; cursor: pointer; border: 2px solid transparent; outline: none; }
     .ab-card:hover, .ab-card:focus { border-color: #0097e6; }
     .ab-card-img { width: 100%; aspect-ratio: 2/3; object-fit: cover; display: block; background: #2a2a2a; }
@@ -310,12 +310,6 @@
         }
         function closeModal() { document.getElementById('ab-overlay').classList.remove('open'); }
 
-        function setGridOffset() {
-            var hdr = document.getElementById('ab-header');
-            var grid = document.getElementById('ab-grid');
-            if (hdr && grid) { grid.style.marginTop = (hdr.offsetHeight + 60) + 'px'; }
-        }
-
         function init() {
             var totalPages = function(){ return Math.max(1, Math.ceil(filteredActors.length/PAGE_SIZE)); };
             document.getElementById('ab-pg-first').addEventListener('click', function(){ currentPage=0; renderPage(); });
@@ -376,8 +370,6 @@
                 var btn = document.getElementById('ab-settings-link');
                 if (btn) { btn.style.display = 'none'; }
             }
-            setGridOffset();
-            window.addEventListener('resize', setGridOffset);
 
             loadData();
         }
@@ -469,7 +461,6 @@
                 .then(function(result){
                     allActors=(result&&result.actors)||[];
                     refresh();
-                    setGridOffset();
                 })
                 ['catch'](function(err){ statusEl.textContent='Error: '+err; });
         }
