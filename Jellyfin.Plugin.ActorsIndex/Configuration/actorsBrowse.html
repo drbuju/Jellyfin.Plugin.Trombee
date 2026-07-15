@@ -19,7 +19,7 @@
     /* Search + pagination row */
     #ab-search-row {
         display: flex; align-items: center; justify-content: center;
-        gap: 10px; max-width: 820px; margin: 0 auto;
+        gap: 10px; max-width: 820px; margin: 0 auto; flex-wrap: wrap;
     }
     #ab-search {
         flex: 1; min-width: 160px; max-width: 480px; padding: 10px 18px;
@@ -63,8 +63,8 @@
     .ab-lib-all-row { font-weight: bold; }
     .ab-sort-btn:hover:not(.active) { background: #383838; }
 
-    /* Grid — exactly 7 columns */
-    #ab-grid { padding: 14px 16px; display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin-top: 240px; /* fallback, overridden by JS */ }
+    /* Grid — responsive: number of columns adapts to available width */
+    #ab-grid { padding: 14px 16px; display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-top: 240px; /* fallback, overridden by JS */ }
     .ab-card { background: #1c1c1c; border-radius: 6px; overflow: hidden; cursor: pointer; border: 2px solid transparent; outline: none; }
     .ab-card:hover, .ab-card:focus { border-color: #0097e6; }
     .ab-card-img { width: 100%; aspect-ratio: 2/3; object-fit: cover; display: block; background: #2a2a2a; }
