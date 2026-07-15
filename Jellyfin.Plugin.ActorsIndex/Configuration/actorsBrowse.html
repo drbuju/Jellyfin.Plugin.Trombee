@@ -64,7 +64,7 @@
     .ab-sort-btn:hover:not(.active) { background: #383838; }
 
     /* Grid — responsive: number of columns adapts to available width */
-    #ab-grid { padding: 14px 16px; display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; max-width: 1230px; margin: 0 auto; }
+    #ab-grid { padding: 14px 16px; display: grid; grid-template-columns: repeat(auto-fill, minmax(max(140px, calc((100% - 70px) / 8)), 1fr)); gap: 10px; }
     .ab-card { background: #1c1c1c; border-radius: 6px; overflow: hidden; cursor: pointer; border: 2px solid transparent; outline: none; }
     .ab-card:hover, .ab-card:focus { border-color: #0097e6; }
     .ab-card-img { width: 100%; aspect-ratio: 2/3; object-fit: cover; display: block; background: #2a2a2a; }
