@@ -9,12 +9,12 @@
     "owner": "drbuju",
     "versions": [
       {
-        "version": "1.0.2.18",
+        "version": "1.0.3.2",
         "changelog": "Test build: compiled for Jellyfin 10.11.8 (dev branch).",
         "targetAbi": "10.11.0.0",
-        "sourceUrl": "https://github.com/drbuju/Jellyfin.Plugin.Trombee/releases/download/test-v1.0.2.18/Jellyfin.Plugin.Trombee-test_1.0.2.18.zip",
-        "checksum": "95e3c26113196783af541a4d26d1c9b0",
-        "timestamp": "2026-07-15T06:16:01Z"
+        "sourceUrl": "https://github.com/drbuju/Jellyfin.Plugin.Trombee/releases/download/test-v1.0.3.2/Jellyfin.Plugin.Trombee-test_1.0.3.2.zip",
+        "checksum": "36359adf7431b95f4c5f70c3912fa203",
+        "timestamp": "2026-07-15T06:26:28Z"
       }
     ]
   }
