@@ -619,7 +619,8 @@
             grid.style.marginTop = '0px';
             if (compact) {
                 hdr.style.top = '';
-                hdr.style.marginTop = (Math.ceil(appHeaderBottom - hdr.getBoundingClientRect().top) - 1) + 'px';
+                // offsetTop is unaffected by Jellyfin's SPA page-transition transforms.
+                hdr.style.marginTop = (Math.ceil(appHeaderBottom - hdr.offsetTop) - 1) + 'px';
                 return;
             }
             hdr.style.top = (Math.ceil(appHeaderBottom) - 1) + 'px';
