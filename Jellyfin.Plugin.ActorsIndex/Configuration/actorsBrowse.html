@@ -261,6 +261,8 @@
         var searchTerm = '', currentPage = 0, filteredActors = [], searchTimer = null;
         var lastFocusedElement = null, resizeFrame = null;
         var trombeeHost = null, topBarTitle = null, trombeeBackBound = false;
+        var modalHistoryClosing = false, modalHistoryTimer = null, pendingModalNavigation = null;
+        var lastHistoryUrl = window.location.href;
 
         function esc(s) {
             return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -271,7 +273,106 @@
             try { hash = decodeURIComponent(hash); } catch (e) { /* use the undecoded hash */ }
             return hash.indexOf('pageUrl=/Trombee/Pages/Browse') !== -1;
         }
-        // Makes one header Back click skip Plugin Pages' duplicate Trombee history entry.
+        // Returns true when the current history entry represents an open actor popup.
+        function isModalHistoryState(state) {
+            return !!(state && typeof state === 'object' && state.trombeeModal);
+        }
+        // Creates one same-URL history entry so native Back can close the actor popup.
+        function pushModalHistory(actor) {
+            var current = window.history.state;
+            var state = Object.assign({}, current && typeof current === 'object' ? current : {});
+            state.trombeeModal = true;
+            state.trombeeActorId = actor.personId || '';
+            state.trombeeActorName = actor.name;
+            window.history.pushState(state, '', window.location.href);
+        }
+        // Finds the actor needed when browser Forward restores a modal history entry.
+        function getHistoryActor(state) {
+            var actorId = state && state.trombeeActorId;
+            var actorName = state && state.trombeeActorName;
+            var actor = null;
+            if (actorId) {
+                actor = allActors.find(function (item) { return String(item.personId) === String(actorId); });
+            }
+            return actor || allActors.find(function (item) { return item.name === actorName; }) || null;
+        }
+        // Removes modal-only fields when a history traversal cannot complete normally.
+        function replaceModalHistoryWithPage() {
+            var current = window.history.state;
+            var state = Object.assign({}, current && typeof current === 'object' ? current : {});
+            delete state.trombeeModal;
+            delete state.trombeeActorId;
+            delete state.trombeeActorName;
+            window.history.replaceState(state, '', window.location.href);
+        }
+        // Navigates only after modal history has been removed, preventing a stale popup entry.
+        function navigateToJellyfinPath(path) {
+            deactivateTrombeeShell();
+            if (window.Emby && window.Emby.Page && window.Emby.Page.show) { window.Emby.Page.show(path); }
+            else { window.location.hash = path; }
+        }
+        // Completes a programmatic modal close and runs any deferred movie navigation.
+        function finishModalHistoryClose() {
+            if (modalHistoryTimer) {
+                window.clearTimeout(modalHistoryTimer);
+                modalHistoryTimer = null;
+            }
+            modalHistoryClosing = false;
+            lastHistoryUrl = window.location.href;
+            var path = pendingModalNavigation;
+            pendingModalNavigation = null;
+            if (path) { window.setTimeout(function () { navigateToJellyfinPath(path); }, 0); }
+        }
+        // Pops the modal entry for Close/Escape or before opening a Jellyfin item.
+        function removeModalHistory(path) {
+            if (modalHistoryClosing) { return; }
+            modalHistoryClosing = true;
+            pendingModalNavigation = path || null;
+            window.history.back();
+            modalHistoryTimer = window.setTimeout(function () {
+                if (!modalHistoryClosing) { return; }
+                replaceModalHistoryWithPage();
+                finishModalHistoryClose();
+            }, 500);
+        }
+        // Handles native Back/Forward, modal history, and Plugin Pages' duplicate route entry.
+        function handleTrombeePopState(e) {
+            var currentUrl = window.location.href;
+            var sameUrl = currentUrl === lastHistoryUrl;
+            var overlay = document.getElementById('ab-overlay');
+            var overlayOpen = !!(overlay && overlay.classList.contains('open'));
+
+            if (modalHistoryClosing) {
+                finishModalHistoryClose();
+                return;
+            }
+            if (isTrombeeRoute() && overlayOpen && !isModalHistoryState(e.state)) {
+                hideModal(true);
+                lastHistoryUrl = currentUrl;
+                return;
+            }
+            if (isTrombeeRoute() && isModalHistoryState(e.state)) {
+                var actor = getHistoryActor(e.state);
+                if (actor) { openModal(actor, true); }
+                else { replaceModalHistoryWithPage(); }
+                lastHistoryUrl = currentUrl;
+                return;
+            }
+            if (isTrombeeRoute() && sameUrl) {
+                window.history.back();
+                return;
+            }
+            lastHistoryUrl = currentUrl;
+        }
+        // Replaces any listener left by an earlier SPA page instance to avoid double Back handling.
+        function bindTrombeeHistory() {
+            if (window.__trombeePopStateHandler) {
+                window.removeEventListener('popstate', window.__trombeePopStateHandler);
+            }
+            window.__trombeePopStateHandler = handleTrombeePopState;
+            window.addEventListener('popstate', handleTrombeePopState);
+        }
+        // Sends Jellyfin's header Back button through the same logic as native browser Back.
         function handleTrombeeBack(e) {
             var button = e.target && e.target.closest
                 ? e.target.closest('.skinHeader .headerBackButton')
@@ -280,26 +381,7 @@
             e.preventDefault();
             e.stopPropagation();
             e.stopImmediatePropagation();
-
-            var currentUrl = window.location.href;
-            var traversalHandled = false;
-            var handleTraversal = function () {
-                traversalHandled = true;
-                if (window.location.href === currentUrl && isTrombeeRoute()) {
-                    window.history.back();
-                }
-            };
-            window.addEventListener('popstate', handleTraversal, { once: true });
             window.history.back();
-            // Plugin Pages navigates its sidebar link twice. Skip only the duplicate
-            // entry, identified by the first back leaving us on the exact same URL.
-            window.setTimeout(function () {
-                if (traversalHandled) { return; }
-                window.removeEventListener('popstate', handleTraversal);
-                if (window.location.href === currentUrl && isTrombeeRoute()) {
-                    window.history.back();
-                }
-            }, 500);
         }
         // Delegates Back clicks because Jellyfin may replace the header button during SPA navigation.
         function bindTrombeeBackButton() {
@@ -441,7 +523,7 @@
             try { return ApiClient.getUrl('Items/'+itemId+'/Images/Primary',{maxWidth:220,quality:80}); }
             catch(e) { return window.location.origin+'/Items/'+itemId+'/Images/Primary?maxWidth=220&quality=80'; }
         }
-        function openModal(actor) {
+        function openModal(actor, fromHistory) {
             document.getElementById('ab-modal-name').textContent=actor.name;
             var countText = actor.appearances+' appearance'+(actor.appearances===1?'':'s');
             if (getSelectedLibraryIds()) { countText += ' (filtered by library)'; }
@@ -505,21 +587,29 @@
                     var itemId = this.getAttribute('data-item-id');
                     var srv=''; try{srv=ApiClient.serverId();}catch(err){}
                     var path='/details?id='+itemId+(srv?'&serverId='+srv:'');
-                    deactivateTrombeeShell();
-                    if (window.Emby && window.Emby.Page && window.Emby.Page.show) { window.Emby.Page.show(path); }
-                    else { window.location.hash=path; }
+                    hideModal(false);
+                    if (isModalHistoryState(window.history.state)) { removeModalHistory(path); }
+                    else { navigateToJellyfinPath(path); }
                 });
             });
 
+            if (!fromHistory) { pushModalHistory(actor); }
             document.getElementById('ab-overlay').classList.add('open');
             document.getElementById('ab-modal-close').focus();
         }
-        // Closes actor details and returns keyboard focus to the actor card that opened it.
-        function closeModal() {
+        // Hides the popup without changing history; browser traversal is handled separately.
+        function hideModal(restoreFocus) {
             document.getElementById('ab-overlay').classList.remove('open');
-            if (lastFocusedElement && document.documentElement.contains(lastFocusedElement)) {
+            if (restoreFocus && lastFocusedElement && document.documentElement.contains(lastFocusedElement)) {
                 lastFocusedElement.focus();
             }
+        }
+        // Closes actor details, restores card focus, and removes its modal history entry.
+        function closeModal() {
+            var overlay = document.getElementById('ab-overlay');
+            if (!overlay.classList.contains('open')) { return; }
+            hideModal(true);
+            if (isModalHistoryState(window.history.state)) { removeModalHistory(null); }
         }
 
         function setGridOffset() {
@@ -571,7 +661,13 @@
             });
             document.getElementById('ab-modal-close').addEventListener('click', closeModal);
             document.getElementById('ab-overlay').addEventListener('click', function(e){ if(e.target===this){closeModal();} });
-            document.addEventListener('keydown', function(e){ if(e.key==='Escape'||e.key==='XF86Back'){closeModal();} });
+            document.addEventListener('keydown', function(e){
+                if ((e.key==='Escape'||e.key==='XF86Back') && document.getElementById('ab-overlay').classList.contains('open')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    closeModal();
+                }
+            });
             document.getElementById('ab-settings-link').addEventListener('click', function() {
                 var p = '/configurationpage?name=Trombee';
                 if (window.Emby && window.Emby.Page && window.Emby.Page.show) { window.Emby.Page.show(p); }
@@ -626,12 +722,14 @@
                 if (resizeFrame) { window.cancelAnimationFrame(resizeFrame); }
                 resizeFrame = window.requestAnimationFrame(setGridOffset);
             });
+            bindTrombeeHistory();
             window.addEventListener('hashchange', function () {
                 if (isTrombeeRoute()) {
                     window.setTimeout(activateTrombeeShell, 0);
                 } else {
                     deactivateTrombeeShell();
                 }
+                lastHistoryUrl = window.location.href;
             });
 
             loadData();
