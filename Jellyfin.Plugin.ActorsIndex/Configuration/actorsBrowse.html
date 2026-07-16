@@ -261,7 +261,7 @@
         var searchTerm = '', currentPage = 0, filteredActors = [], searchTimer = null;
         var lastFocusedElement = null, resizeFrame = null;
         var trombeeHost = null, topBarTitle = null, trombeeBackBound = false;
-        var modalHistoryClosing = false, modalHistoryTimer = null, pendingModalNavigation = null;
+        var modalHistoryClosing = false, modalHistoryTimer = null;
         var lastHistoryUrl = window.location.href;
 
         function esc(s) {
@@ -305,13 +305,13 @@
             delete state.trombeeActorName;
             window.history.replaceState(state, '', window.location.href);
         }
-        // Navigates only after modal history has been removed, preventing a stale popup entry.
+        // Leaves the Trombee shell clean before Jellyfin renders another SPA route.
         function navigateToJellyfinPath(path) {
             deactivateTrombeeShell();
             if (window.Emby && window.Emby.Page && window.Emby.Page.show) { window.Emby.Page.show(path); }
             else { window.location.hash = path; }
         }
-        // Completes a programmatic modal close and runs any deferred movie navigation.
+        // Completes a programmatic modal close after its history traversal finishes.
         function finishModalHistoryClose() {
             if (modalHistoryTimer) {
                 window.clearTimeout(modalHistoryTimer);
@@ -319,15 +319,11 @@
             }
             modalHistoryClosing = false;
             lastHistoryUrl = window.location.href;
-            var path = pendingModalNavigation;
-            pendingModalNavigation = null;
-            if (path) { window.setTimeout(function () { navigateToJellyfinPath(path); }, 0); }
         }
-        // Pops the modal entry for Close/Escape or before opening a Jellyfin item.
-        function removeModalHistory(path) {
+        // Pops the modal entry for Close/Escape without consuming the preceding page entry.
+        function removeModalHistory() {
             if (modalHistoryClosing) { return; }
             modalHistoryClosing = true;
-            pendingModalNavigation = path || null;
             window.history.back();
             modalHistoryTimer = window.setTimeout(function () {
                 if (!modalHistoryClosing) { return; }
@@ -588,8 +584,8 @@
                     var srv=''; try{srv=ApiClient.serverId();}catch(err){}
                     var path='/details?id='+itemId+(srv?'&serverId='+srv:'');
                     hideModal(false);
-                    if (isModalHistoryState(window.history.state)) { removeModalHistory(path); }
-                    else { navigateToJellyfinPath(path); }
+                    // Keep the modal entry behind the detail page so Back restores this actor popup.
+                    navigateToJellyfinPath(path);
                 });
             });
 
@@ -609,7 +605,7 @@
             var overlay = document.getElementById('ab-overlay');
             if (!overlay.classList.contains('open')) { return; }
             hideModal(true);
-            if (isModalHistoryState(window.history.state)) { removeModalHistory(null); }
+            if (isModalHistoryState(window.history.state)) { removeModalHistory(); }
         }
 
         function setGridOffset() {
